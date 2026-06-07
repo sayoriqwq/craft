@@ -1,0 +1,19 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "mini-waza",
+  "description": "Customized Waza framework skeleton with no predefined skills.",
+  "owner": {
+    "name": "sayori",
+    "email": ""
+  },
+  "plugins": [
+    {
+      "name": "mini-waza",
+      "description": "Installs the Mini-Waza dispatcher. No user-defined skills are bundled yet.",
+      "version": "0.1.0",
+      "category": "development",
+      "source": "./",
+      "homepage": ""
+    }
+  ]
+}

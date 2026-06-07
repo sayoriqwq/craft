@@ -1,0 +1,21 @@
+{
+  "name": "mini-waza",
+  "version": "0.1.0",
+  "description": "Customized Waza framework skeleton with no predefined skills.",
+  "private": true,
+  "license": "MIT",
+  "files": [
+    "LICENSE",
+    "README.md",
+    "rules",
+    "scripts",
+    "skills",
+    "!**/__pycache__/**",
+    "!**/*.pyc"
+  ],
+  "pi": {
+    "skills": [
+      "./skills"
+    ]
+  }
+}

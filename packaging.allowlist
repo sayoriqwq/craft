@@ -1,0 +1,7 @@
+# Allowlist for `make package`. Default-deny: only paths matching one of these
+# patterns ship in mini-waza.zip.
+
+LICENSE
+README.md
+rules/**
+skills/**
