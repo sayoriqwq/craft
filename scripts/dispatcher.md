@@ -16,6 +16,8 @@ against skills that exist in the routing table.
 <!-- routing-table:start -->
 | Intent | Skill | File |
 |--------|-------|------|
+| ISO skill creation from primitive | iso-skill-creator | `skills/iso-skill-creator/SKILL.md` |
+| ISO skill improvement patch | iso-skill-improver | `skills/iso-skill-improver/SKILL.md` |
 | YM aim drift warning | ym-aiming | `skills/ym-aiming/SKILL.md` |
 <!-- routing-table:end -->
 

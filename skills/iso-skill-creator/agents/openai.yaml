@@ -1,0 +1,4 @@
+interface:
+  display_name: "Skill Creator"
+  short_description: "Design skills from primitive behavior pressure"
+  default_prompt: "Use $iso-skill-creator to turn this workflow into a concise, validated Codex skill."

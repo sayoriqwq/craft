@@ -9,7 +9,7 @@ current customization starts with a single user-defined `ym` skill.
 ## Current State
 
 - Codex plugin metadata: present.
-- User-defined skills: `ym-aiming`.
+- User-defined skills: `iso-skill-creator`, `iso-skill-improver`, `ym-aiming`.
 - Waza original skills: removed.
 - Claude Code marketplace metadata: not part of this repo.
 
@@ -51,8 +51,8 @@ global Codex skill directory, use:
 make install-codex-skill
 ```
 
-This installs `ym-aiming` from `skills/ym-aiming/SKILL.md` without changing the
-plugin source of truth.
+This installs the current `skills/*/SKILL.md` set without changing the plugin
+source of truth.
 
 ## Adding A Skill
 

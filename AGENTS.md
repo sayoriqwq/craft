@@ -8,7 +8,7 @@
 `mini-waza` is a Codex plugin skeleton for user-defined workflow skills.
 
 The framework started from a zero-skill baseline. The current customization
-defines `ym-aiming` as the first user-defined skill under `skills/<name>/SKILL.md`.
+defines user-owned `iso-*` and `ym-*` skills under `skills/<name>/SKILL.md`.
 
 ## Boundaries
 

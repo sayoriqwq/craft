@@ -1,0 +1,4 @@
+interface:
+  display_name: "Skill Improver"
+  short_description: "Patch named skills from direct feedback"
+  default_prompt: "Use $iso-skill-improver to patch this named skill from the feedback."

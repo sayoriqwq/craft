@@ -21,4 +21,6 @@ When a skill is added:
 
 | Intent | Skill | File |
 | --- | --- | --- |
+| Create or update skill from primitive behavior pressure | `iso-skill-creator` | `skills/iso-skill-creator/SKILL.md` |
+| Patch named skill trigger, boundary, workflow, or validation | `iso-skill-improver` | `skills/iso-skill-improver/SKILL.md` |
 | Active aim drift warning or aim brief | `ym-aiming` | `skills/ym-aiming/SKILL.md` |

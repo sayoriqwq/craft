@@ -33,4 +33,4 @@ install-codex-plugin:
 	codex plugin marketplace add ~
 
 install-codex-skill:
-	npx skills add . -a codex -g --skill ym-aiming -y --full-depth
+	npx skills add . -a codex -g --skill '*' -y --full-depth
