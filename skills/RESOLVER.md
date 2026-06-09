@@ -6,9 +6,7 @@ All Mini-Waza skills use the same output convention: prefix the first
 user-facing line with `🧭` inline, not as its own paragraph. This marker is a
 visible loaded-skill signal.
 
-No skills are defined yet.
-
-This file is the future routing registry for user-defined workflow skills.
+This file is the routing registry for user-defined workflow skills.
 Do not recreate Waza's original eight-skill table here.
 
 When a skill is added:
@@ -23,3 +21,4 @@ When a skill is added:
 
 | Intent | Skill | File |
 | --- | --- | --- |
+| Active aim drift warning or aim brief | `ym-aiming` | `skills/ym-aiming/SKILL.md` |

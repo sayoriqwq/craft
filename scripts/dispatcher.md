@@ -8,7 +8,7 @@ description: "Dispatcher for user-defined Mini-Waza workflow skills. Use when a 
 Prefix your first user-facing line with `🧭` inline, not as its own paragraph
 when a Mini-Waza skill is active.
 
-Mini-Waza is a Codex plugin with no predefined workflow skills. Match only
+Mini-Waza is a Codex plugin for user-defined workflow skills. Match only
 against skills that exist in the routing table.
 
 ## Routing Table
@@ -16,6 +16,7 @@ against skills that exist in the routing table.
 <!-- routing-table:start -->
 | Intent | Skill | File |
 |--------|-------|------|
+| YM aim drift warning | ym-aiming | `skills/ym-aiming/SKILL.md` |
 <!-- routing-table:end -->
 
 ## How This Works

@@ -1,4 +1,4 @@
-.PHONY: test verify-framework verify-generated verify-routing verify-scripts package regenerate
+.PHONY: test verify-framework verify-generated verify-routing verify-scripts package regenerate install-codex-plugin install-codex-skill
 
 test: verify-framework verify-generated verify-routing verify-scripts
 
@@ -27,3 +27,10 @@ verify-scripts:
 
 package:
 	./scripts/package-skill.sh dist/mini-waza.zip
+
+install-codex-plugin:
+	python3 scripts/install-codex-plugin.py --root .
+	codex plugin marketplace add ~
+
+install-codex-skill:
+	npx skills add . -a codex -g --skill ym-aiming -y --full-depth

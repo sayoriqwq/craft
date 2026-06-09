@@ -3,19 +3,19 @@
 `mini-waza` is a Codex plugin skeleton for user-defined workflow skills.
 
 It keeps the Waza-inspired skill framework shape without shipping Waza's
-predefined skill taxonomy. The first useful state is a valid Codex plugin with
-zero user-defined skills.
+predefined skill taxonomy. Zero skills remains a valid framework state, but the
+current customization starts with a single user-defined `ym` skill.
 
 ## Current State
 
 - Codex plugin metadata: present.
-- User-defined skills: none.
+- User-defined skills: `ym-aiming`.
 - Waza original skills: removed.
 - Claude Code marketplace metadata: not part of this repo.
 
 ## Repository Map
 
-- `skills/RESOLVER.md` records the current skill registry. It is empty until the user defines skills.
+- `skills/RESOLVER.md` records the current skill registry.
 - `.codex-plugin/plugin.json` is the generated Codex plugin manifest.
 - `scripts/dispatcher-template.md` is the source for the generated dispatcher reference.
 - `scripts/build_metadata.py` regenerates `.codex-plugin/plugin.json`, `package.json`, and `scripts/dispatcher.md`.
@@ -30,6 +30,29 @@ make test
 make regenerate
 make package
 ```
+
+## Install Locally
+
+Mini-Waza's primary runtime shape is a Codex plugin. For local development, map
+this repo into the personal Codex plugin marketplace:
+
+```bash
+make install-codex-plugin
+```
+
+Open a new Codex thread after installing so the plugin skills are loaded.
+The local marketplace maps `~/plugins/mini-waza` back to this repo, so source
+edits stay in one place.
+
+For a Waza-style quick check that installs the current skill directly into the
+global Codex skill directory, use:
+
+```bash
+make install-codex-skill
+```
+
+This installs `ym-aiming` from `skills/ym-aiming/SKILL.md` without changing the
+plugin source of truth.
 
 ## Adding A Skill
 

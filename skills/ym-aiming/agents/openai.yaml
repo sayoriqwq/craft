@@ -1,0 +1,4 @@
+interface:
+  display_name: "Aiming"
+  short_description: "Warn when a request drifts from the active aim"
+  default_prompt: "Use $ym-aiming to check whether this request drifts from the active aim; return an Aim note for drift or an Aim brief when setting a target."
