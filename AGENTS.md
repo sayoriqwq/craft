@@ -37,6 +37,12 @@ This repo does not own:
 - Skill design language lives under `rules/skills/`. Do not add more
   prefix-named rule files such as `skill-*.md` when a directory layer can carry
   the scope.
+- Craft `skills/<name>/SKILL.md` files are the source authority for Craft skill
+  semantics. Copies installed into external harnesses or target repos are
+  managed projections and must not redefine the skill.
+- Executable setup, sync, and verification mechanisms belong to the owning
+  harness or CLI repo. Craft skills may call those mechanisms, but should not
+  reimplement them as prose.
 - Do not reconstruct Waza's old skill taxonomy; use Waza only as mechanism
   lineage.
 - Keep zero skills as a valid framework state.

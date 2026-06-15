@@ -28,4 +28,6 @@ When a skill is added:
 | Craft aim and topic alignment | `aim` | `skills/aim/SKILL.md` |
 | Controlled high-density Chinese collaboration mode | `density` | `skills/density/SKILL.md` |
 | Block expansion until current v1 lands | `land` | `skills/land/SKILL.md` |
+| Pin external repository source | `pin` | `skills/pin/SKILL.md` |
+| Set up Effect target area with effect-harness | `setup-effect-area` | `skills/setup-effect-area/SKILL.md` |
 | Expand vague seed idea into actionable target | `want` | `skills/want/SKILL.md` |

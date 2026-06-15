@@ -9,7 +9,7 @@ current customization defines the user's Craft skill domain.
 ## Current State
 
 - Codex plugin metadata: present.
-- User-defined skills: `skill-write`, `skill-patch`, `aim`, `density`, `argue`, `land`.
+- User-defined skills: recorded in `skills/RESOLVER.md`.
 - Waza original skills: removed.
 - Claude Code marketplace metadata: not part of this repo.
 

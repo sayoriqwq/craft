@@ -28,5 +28,8 @@ this profile.
   reusable skill-design rule.
 - Future skills should start from `rules/skills/`: primitive, shape, care, and
   authoring.
+- Treat Craft skill files as source authority. Runtime copies in other repos are
+  projections; CLI/verifier implementation belongs in the repo that owns that
+  mechanism.
 - The current loaded-skill marker is `🧭`. Future skill families may use
   family-specific markers.
