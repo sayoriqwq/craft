@@ -14,10 +14,10 @@ Workflow for turning a primitive into a Partita skill.
 - Use [care](care.md) to track projection loss and future patch surfaces.
 - Separate soft agent judgment from hard deterministic constraints. Soft
   constraints stay in model-applied instructions. Hard constraints must have a
-  machine-checkable surface such as a script, CLI, verifier, schema, test, or
+  machine-checkable surface such as a CLI command, verifier, schema, test, or
   package validation.
-- Put a single hard check in `scripts/`. If related checks form a command
-  family, design a CLI.
+- Put repeated Partita maintenance checks in the TypeScript/Effect CLI instead
+  of accumulating ad hoc scripts.
 - Keep workflow moves reviewable. When user confirmation is needed, ask for the
   smallest uncertain semantic unit.
 - Materialize only Codex-supported skill surfaces in this repo.

@@ -27,6 +27,9 @@ importers:
       '@effect/vitest':
         specifier: 4.0.0-beta.90
         version: 4.0.0-beta.90(effect@4.0.0-beta.90)(vitest@4.1.9(@types/node@25.9.3)(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0)(yaml@2.9.0)))
+      '@types/node':
+        specifier: ^25.6.0
+        version: 25.9.3
       '@typescript/native-preview':
         specifier: 7.0.0-dev.20260624.1
         version: 7.0.0-dev.20260624.1
@@ -39,6 +42,9 @@ importers:
       typescript:
         specifier: ^6.0.3
         version: 6.0.3
+      vitest:
+        specifier: ^4.1.8
+        version: 4.1.9(@types/node@25.9.3)(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0)(yaml@2.9.0))
 
 packages:
 

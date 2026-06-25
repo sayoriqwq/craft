@@ -20,7 +20,7 @@ bundled resources. Shape checks happen after the primitive is known.
 - `body`: every-use instructions in `SKILL.md`.
 - `references`: conditional detail loaded only when the active task needs it.
 - `verifier`: deterministic checks over supported file shape, routing, and
-  package surfaces. Hard constraints belong here, or in scripts, CLIs, tests,
+  package surfaces. Hard constraints belong here, or in CLI commands, tests,
   schemas, or package checks.
 
 ## Main Skill Body
@@ -51,7 +51,7 @@ bundled resources. Shape checks happen after the primitive is known.
 - Check that soft agent judgment and hard deterministic constraints are
   separated.
 - Check that each hard constraint has a machine-checkable enforcement surface.
-  A `## Hard Boundary` sentence without a verifier, script, CLI, test, schema,
+  A `## Hard Boundary` sentence without a verifier, CLI command, test, schema,
   or package check is not a complete hard constraint.
 - Check that workflow steps are reviewable and ask for the smallest uncertain
   semantic unit when user confirmation is needed.
@@ -65,15 +65,15 @@ bundled resources. Shape checks happen after the primitive is known.
 ## Hard Constraints
 
 - A hard constraint must point to a machine-checkable enforcement surface.
-- Put a single deterministic check in `scripts/`.
-- When checks become a parameterized family or repeated command surface, design
-  a CLI instead of accumulating unrelated scripts.
-- The skill body should teach when to run the script or CLI, how to run it, and
+- Put deterministic Partita maintenance in the TypeScript/Effect CLI.
+- When checks become a parameterized family or repeated command surface, extend
+  the CLI instead of accumulating unrelated mechanisms.
+- The skill body should teach when to run the CLI, how to run it, and
   what failure means. It should not rely on prose to enforce hard constraints.
 
 ## Resources
 
-- Add scripts only for deterministic repeated operations.
+- Add CLI commands only for deterministic repeated operations owned by Partita.
 - Add references for conditional detail.
 - Add examples or cases only from real use or user-provided material.
 - Keep generated metadata and runtime copies out of manual patch scope.

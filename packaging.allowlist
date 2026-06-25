@@ -1,4 +1,4 @@
-# Allowlist for `make package`. Default-deny: only paths matching one of these
+# Allowlist for `pnpm package`. Default-deny: only paths matching one of these
 # patterns ship in partita.zip.
 
 LICENSE

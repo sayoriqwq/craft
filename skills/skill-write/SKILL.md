@@ -36,8 +36,8 @@ Use this skill when the user asks to:
 
 - create, write, design, migrate, or update a Codex skill;
 - turn a workflow, primitive, habit, or repeated correction into a skill;
-- decide whether material belongs in a skill, prompt/profile, docs, CLI, script,
-  reference, or asset;
+- decide whether material belongs in a skill, prompt/profile, docs, CLI,
+  verifier/test, reference, or asset;
 - fix a skill that is too generic, too broad, runtime-shaped, or weakly routed;
 - derive a plugin-distributed skill while preserving primitive semantics.
 
@@ -59,7 +59,7 @@ belong to the requested skill-writing task. It stops when the skill baseline is
 materialized, validated, and reported, or when the missing primitive choice
 blocks safe authoring. Its constraints are mixed: design judgment is `soft`;
 frontmatter parsing, metadata generation, link checks, package checks, and test
-commands are primitive `constraint.hard` only when enforced by scripts, CLIs,
+commands are primitive `constraint.hard` only when enforced by CLI commands,
 verifiers, or tests.
 
 Use agent judgment for:
@@ -78,14 +78,14 @@ Use agent judgment for:
 ## Hard Boundary
 
 This section mixes model-applied boundaries with hard checks. Only items tied
-to machine-checkable surfaces such as scripts, CLIs, verifiers, tests, schemas,
+to machine-checkable surfaces such as CLI commands, verifiers, tests, schemas,
 or package validation are primitive `constraint.hard`; prose-only boundaries
 remain strict `soft` constraints.
 
 - Deterministic scaffolding, metadata generation, linting, packaging, and
-  filesystem checks belong in scripts or CLIs.
-- Put a single hard check in `scripts/`. If related checks form a command
-  family, design a CLI instead of accumulating unrelated scripts.
+  filesystem checks belong in the TypeScript/Effect CLI, verifiers, or tests.
+- Extend the CLI when related checks form a command family instead of
+  accumulating ad hoc scripts.
 - Do not add README, changelog, install guide, process notes, or unrelated docs
   inside a skill directory.
 - Do not invent unsupported Codex skill metadata.
@@ -103,7 +103,7 @@ remain strict `soft` constraints.
    - `skill`: behavior intervention with trigger, boundary, workflow, validation;
    - `prompt/profile`: always-on preference or collaboration style;
    - `docs`: durable explanation for humans, not activation behavior;
-   - `script/CLI`: deterministic, repeated, or fragile operation;
+   - `CLI/verifier`: deterministic, repeated, or fragile operation;
    - `reference`: conditional detail loaded only when needed;
    - `asset`: material used in final output.
 3. Preserve layer boundaries: primitive decides semantics, shape carries them,
@@ -144,5 +144,5 @@ Before calling the skill usable, verify:
 - stateful edits are limited to the skill and directly supporting resources,
   rules, resolver metadata, or verifier surfaces required by the task;
 - the skill directory contains only `SKILL.md` and direct supporting resources;
-- `make regenerate` and `make test` pass after adding or changing Partita
+- `pnpm generate` and `pnpm verify` pass after adding or changing Partita
   skills.

@@ -14,8 +14,8 @@ When a skill is added:
 1. apply `rules/skills/index.md`;
 2. create `skills/<name>/SKILL.md`;
 3. add one row to the table below;
-4. run `make regenerate`;
-5. run `make test`.
+4. run `pnpm generate`;
+5. run `pnpm verify`.
 
 ## Routing Table
 

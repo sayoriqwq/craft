@@ -11,7 +11,7 @@ export default antfu(
   },
   {
     name: 'partita/effect-boundaries',
-    files: ['src/**/*.ts', 'tests/**/*.ts'],
+    files: ['bin/**/*.ts', 'src/**/*.ts', 'tests/**/*.ts'],
     rules: {
       'no-restricted-imports': [
         'error',

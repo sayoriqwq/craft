@@ -1,19 +1,23 @@
 {
   "name": "partita",
+  "type": "module",
   "version": "0.1.0",
   "description": "Codex plugin harness for user-defined workflow skills.",
   "author": "sayori",
   "private": true,
   "license": "MIT",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "bin": {
+    "partita": "dist/bin/partita.js"
+  },
   "files": [
+    "dist",
     ".codex-plugin",
     "LICENSE",
     "README.md",
     "rules",
-    "scripts",
-    "skills",
-    "!**/__pycache__/**",
-    "!**/*.pyc"
+    "skills"
   ],
   "dependencies": {
     "effect": "4.0.0-beta.90",
@@ -21,21 +25,31 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^9.0.0",
-    "eslint": "^10.3.0",
+    "@types/node": "^25.6.0",
     "@effect/vitest": "4.0.0-beta.90",
     "@effect/tsgo": "0.14.6",
     "@effect/language-service": "0.86.2",
     "@typescript/native-preview": "7.0.0-dev.20260624.1",
+    "eslint": "^10.3.0",
     "knip": "^6.12.0",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.8"
   },
   "scripts": {
+    "build": "rm -rf dist && tsc --project tsconfig.build.json && chmod +x dist/bin/partita.js",
     "effect:status": "node \"/Users/sayori/Desktop/yume-infra/effect-harness/dist/bin/effect-harness.js\" status",
     "effect:verify": "node \"/Users/sayori/Desktop/yume-infra/effect-harness/dist/bin/effect-harness.js\" verify --target .",
+    "generate": "pnpm build && node dist/bin/partita.js generate",
+    "generate:check": "pnpm build && node dist/bin/partita.js generate --check",
+    "install:codex-plugin": "pnpm build && node dist/bin/partita.js install codex-plugin",
+    "install:codex-skill": "pnpm build && node dist/bin/partita.js install codex-skill",
     "knip": "knip",
-    "lint": "eslint eslint.config.mjs \"src/**/*.ts\" \"tests/**/*.ts\" --no-error-on-unmatched-pattern",
-    "lint:fix": "eslint eslint.config.mjs \"src/**/*.ts\" \"tests/**/*.ts\" --fix --no-error-on-unmatched-pattern",
+    "link:global": "pnpm build && pnpm link --global",
+    "lint": "eslint eslint.config.mjs \"bin/**/*.ts\" \"src/**/*.ts\" \"tests/**/*.ts\" --no-error-on-unmatched-pattern",
+    "lint:fix": "eslint eslint.config.mjs \"bin/**/*.ts\" \"src/**/*.ts\" \"tests/**/*.ts\" --fix --no-error-on-unmatched-pattern",
+    "package": "pnpm build && node dist/bin/partita.js package --out dist/partita.zip",
+    "test": "vitest run",
     "typecheck": "tsgo --noEmit",
-    "verify": "make test && pnpm typecheck && pnpm lint && pnpm knip && pnpm effect:verify"
+    "verify": "pnpm generate:check && node dist/bin/partita.js verify && pnpm typecheck && pnpm test && pnpm lint && pnpm knip && pnpm effect:verify"
   }
 }

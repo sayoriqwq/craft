@@ -12,14 +12,15 @@ current customization defines the user's Partita skill domain.
 - User-defined skills: recorded in `skills/RESOLVER.md`.
 - Waza original skills: removed.
 - Claude Code marketplace metadata: not part of this repo.
+- Executable maintenance is moving to the TypeScript/Effect `partita` CLI.
 
 ## Repository Map
 
 - `skills/RESOLVER.md` records the current skill registry.
 - `.codex-plugin/plugin.json` is the generated Codex plugin manifest.
-- `scripts/dispatcher-template.md` is the source for the generated dispatcher reference.
-- `scripts/build_metadata.py` regenerates `.codex-plugin/plugin.json`, `package.json`, and `scripts/dispatcher.md`.
-- `scripts/verify_skills.py` validates the framework and any future `skills/*/SKILL.md`.
+- `skills/DISPATCHER.md` is the generated dispatcher reference.
+- `bin/partita.ts` is the TypeScript/Effect CLI entrypoint.
+- `src/partita/` owns generation, verification, packaging, and local install behavior.
 - `rules/` contains shared behavior rules that future skills may reference.
 - `rules/skills/` is the harness entrypoint for Partita skill design language:
   primitive, shape, care, and authoring.
@@ -28,10 +29,11 @@ current customization defines the user's Partita skill domain.
 ## Commands
 
 ```bash
-make test
-make regenerate
-make install
-make package
+pnpm generate
+pnpm generate:check
+pnpm verify
+pnpm package
+pnpm link:global
 ```
 
 ## Install Locally
@@ -40,7 +42,8 @@ Partita's local install path syncs skills globally first, then maps this repo
 into the personal Codex plugin marketplace:
 
 ```bash
-make install
+pnpm install:codex-skill
+pnpm install:codex-plugin
 ```
 
 Open a new Codex thread after installing so global skills are reloaded. The
@@ -50,10 +53,10 @@ stay in one place.
 To run only the global sync:
 
 ```bash
-make install-codex-skill
+pnpm install:codex-skill
 ```
 
-`make install-codex-plugin` also runs the global sync before marketplace setup.
+`pnpm install:codex-plugin` maps the local plugin marketplace entry.
 
 ## Adding A Skill
 
@@ -81,6 +84,6 @@ dispatch_intent: "short routing label"
 After adding or changing a skill:
 
 ```bash
-make regenerate
-make test
+pnpm generate
+pnpm verify
 ```

@@ -47,7 +47,7 @@ skill patch. It stops when the requested case patch or structure audit is
 implemented, validated, and reported. Its constraints are mixed: routing,
 scope, and patch judgment are `soft`; generated metadata, link checks, package
 checks, and test commands are primitive `constraint.hard` only when enforced by
-scripts, CLIs, verifiers, or tests.
+CLI commands, verifiers, or tests.
 
 Use agent judgment for:
 
@@ -62,7 +62,7 @@ Use agent judgment for:
 ## Hard Boundary
 
 This section mixes model-applied boundaries with hard checks. Only items tied
-to machine-checkable surfaces such as scripts, CLIs, verifiers, tests, schemas,
+to machine-checkable surfaces such as CLI commands, verifiers, tests, schemas,
 or package validation are primitive `constraint.hard`; prose-only boundaries
 remain strict `soft` constraints.
 
@@ -121,4 +121,4 @@ Before calling the improvement done, verify:
 - the edit is smaller than a rewrite;
 - concrete cases live in one-level references, not the every-use body;
 - generated dispatcher/resolver metadata is in sync when needed;
-- `make regenerate` and `make test` pass after Partita skill changes.
+- `pnpm generate` and `pnpm verify` pass after Partita skill changes.

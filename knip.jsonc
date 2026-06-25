@@ -1,18 +1,15 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema-jsonc.json",
   "entry": [
+    "bin/partita.ts",
     "src/index.ts"
   ],
   "project": [
-    "src/**/*.ts"
+    "bin/**/*.ts",
+    "src/**/*.ts",
+    "tests/**/*.ts"
   ],
   "ignoreDependencies": [
-    "@effect/platform-node",
-    "@effect/tsgo",
-    "@effect/vitest",
-    "effect"
-  ],
-  "ignoreBinaries": [
-    "make"
+    "@effect/tsgo"
   ]
 }

@@ -50,15 +50,16 @@ This repo does not own:
 - Before changing skill names, trigger policy, harness install behavior, global
   skill state, or marker conventions, use an interpretation gate if the user's
   instruction can be read more than one way.
-- If a new skill is added, update `skills/RESOLVER.md`, run `make regenerate`,
-  then run `make test`.
+- If a new skill is added, update `skills/RESOLVER.md`, run `pnpm generate`,
+  then run `pnpm verify`.
 
 ## Commands
 
 ```bash
-make test
-make regenerate
-make package
+pnpm generate
+pnpm generate:check
+pnpm package
+pnpm verify
 ```
 
 <!-- effect-harness:start -->
