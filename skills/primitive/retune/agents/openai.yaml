@@ -1,6 +1,6 @@
 interface:
   display_name: "Retune"
-  short_description: "Tune an existing skill from observed drift"
-  default_prompt: "Use pm:retune to correct this existing Partita skill from the observed case or structure audit."
+  short_description: "Patch an existing skill from a real case"
+  default_prompt: "Use pm:retune to patch this existing Partita skill from the real case."
 policy:
-  allow_implicit_invocation: true
+  allow_implicit_invocation: false

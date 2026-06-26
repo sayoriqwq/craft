@@ -66,8 +66,9 @@ remains `pm:notate`.
 Only add a skill after the user defines the workflow.
 
 Read `wiki/practice/create.md` before writing a new skill. Use
-`wiki/practice/patch.md` when changing an existing skill from a real case or
-structure audit. The current `SKILL.md` body shape is documented in
+`pm:notate` for internal primitive skill creation, `pm:conduct` for public
+workflow skill creation, and `pm:retune` only for patching an existing valid
+skill from a real case. The current `SKILL.md` body shape is documented in
 `wiki/projection/codex/skill-md.md`.
 
 Minimum shape:
@@ -102,8 +103,13 @@ and `description`; official optional frontmatter keys are `license`,
 the policy key must live under the `policy` block.
 
 `partita` is the product and plugin name, not a skill prefix. The `primitive`
-namespace projects as `pm:<name>` in dispatcher and plugin-facing handles while
-frontmatter and global installed skills keep the short skill name.
+source namespace is the current Partita-managed base layer and projects as
+`pm:<name>` in dispatcher and plugin-facing handles while frontmatter and
+global installed skills keep the short skill name.
+
+`skills/DISPATCHER.md` is generated from `SKILL.md` frontmatter and
+`agents/openai.yaml`. Its routing table projects `Handle`, `Name`,
+`Invocation`, `Description`, and `File`.
 
 After adding or changing a skill:
 

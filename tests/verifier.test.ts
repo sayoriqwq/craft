@@ -17,6 +17,7 @@ const requiredSourceFiles = [
   'wiki/skill/primitive.md',
   'wiki/skill/orchestrator.md',
   'wiki/skill/case/index.md',
+  'wiki/skill/case/insufficient-material.md',
   'wiki/skill/case/pattern.md',
   'wiki/skill/case/pressure.md',
   'wiki/skill/governance/index.md',
@@ -32,6 +33,7 @@ const requiredSourceFiles = [
   'wiki/projection/codex/frontmatter.md',
   'wiki/projection/codex/openai.md',
   'wiki/projection/codex/dispatcher.md',
+  'wiki/projection/codex/projection-marker.md',
   'wiki/projection/codex/references.md',
   'wiki/projection/codex/skill-md.md',
   'wiki/projection/verifier/index.md',
@@ -122,9 +124,11 @@ describe('Partita verifier', () => {
         '',
         `Prefix with ${marker}.`,
         '',
-        '| Skill | Description | File |',
-        '| --- | --- | --- |',
-        '| missing | Missing skill fixture | `skills/missing/SKILL.md` |',
+        '<!-- partita:projection:start id="routing-table" source="skills" mode="block-table" -->',
+        '| Handle | Name | Invocation | Description | File |',
+        '| --- | --- | --- | --- | --- |',
+        '| missing | missing | true | Missing skill fixture | `skills/missing/SKILL.md` |',
+        '<!-- partita:projection:end id="routing-table" -->',
       ].join('\n'))
 
       const report = yield* verifyRouting({ root })
@@ -145,10 +149,12 @@ describe('Partita verifier', () => {
         '',
         `Prefix with ${marker} when a Partita skill is active.`,
         '',
-        '| Skill | Description | File |',
-        '| --- | --- | --- |',
-        '| demo | Demo skill fixture | `skills/demo/SKILL.md` |',
-        '| pm:notate | Notate skill fixture | `skills/primitive/notate/SKILL.md` |',
+        '<!-- partita:projection:start id="routing-table" source="skills" mode="block-table" -->',
+        '| Handle | Name | Invocation | Description | File |',
+        '| --- | --- | --- | --- | --- |',
+        '| demo | demo | true | Demo skill fixture | `skills/demo/SKILL.md` |',
+        '| pm:notate | notate | true | Notate skill fixture | `skills/primitive/notate/SKILL.md` |',
+        '<!-- partita:projection:end id="routing-table" -->',
       ].join('\n'))
 
       const report = yield* verifySourceProject({ root })
@@ -255,6 +261,45 @@ describe('Partita verifier', () => {
       assert.strictEqual(report.ok, false)
       assert.isTrue(codes.includes('version_file.forbidden'))
       assert.isTrue(codes.includes('surface.removed_exists'))
+    }))
+
+  it.effect('reports legacy projection markers', () =>
+    Effect.gen(function* () {
+      const root = makeValidSourceFixture()
+      write(root, 'skills/DISPATCHER.md', [
+        '# Partita Dispatcher',
+        '',
+        `Prefix with ${marker} when a Partita skill is active.`,
+        '',
+        '<!-- routing-table:start -->',
+        '| Skill | Description | File |',
+        '| --- | --- | --- |',
+        '| demo | Demo skill fixture | `skills/demo/SKILL.md` |',
+        '<!-- routing-table:end -->',
+      ].join('\n'))
+
+      const report = yield* verifySourceProject({ root })
+      const codes = report.issues.map(issue => issue.code)
+
+      assert.strictEqual(report.ok, false)
+      assert.isTrue(codes.includes('projection.legacy_marker'))
+      assert.isTrue(codes.includes('routing.missing_projection_marker'))
+    }))
+
+  it.effect('reports file projection drift', () =>
+    Effect.gen(function* () {
+      const root = makeValidSourceFixture()
+      write(root, 'skills/demo/references/insufficient-material.md', [
+        '<!-- partita:projection:file source="wiki/skill/case/insufficient-material.md" mode="copy" -->',
+        '',
+        '# stale',
+      ].join('\n'))
+
+      const report = yield* verifySourceProject({ root })
+      const codes = report.issues.map(issue => issue.code)
+
+      assert.strictEqual(report.ok, false)
+      assert.isTrue(codes.includes('projection.file_drift'))
     }))
 })
 
@@ -371,9 +416,11 @@ function dispatcher(): string {
     '',
     `Prefix with ${marker} when a Partita skill is active.`,
     '',
-    '| Skill | Description | File |',
-    '| --- | --- | --- |',
-    '| demo | Demo skill fixture | `skills/demo/SKILL.md` |',
+    '<!-- partita:projection:start id="routing-table" source="skills" mode="block-table" -->',
+    '| Handle | Name | Invocation | Description | File |',
+    '| --- | --- | --- | --- | --- |',
+    '| demo | demo | true | Demo skill fixture | `skills/demo/SKILL.md` |',
+    '<!-- partita:projection:end id="routing-table" -->',
   ].join('\n')
 }
 

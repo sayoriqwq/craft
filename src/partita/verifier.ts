@@ -24,7 +24,14 @@ const skillRefPattern = /skills\/(?:(primitive)\/)?([a-z][a-z0-9_-]*)\/SKILL\.md
 const linkPattern = /\[[^\]]*\]\(([^)]+)\)/gu
 const wikiLinkPattern = /\[\[([^\]\n]+)\]\]/gu
 const urlPrefixes = ['http://', 'https://', 'mailto:', 'ftp://', 'tel:', 'data:']
-const loadedSkillMarker = '🧭'
+const loadedSkillMarkers = ['🧭', '🎼'] as const
+const routingTableStart = '<!-- partita:projection:start id="routing-table" source="skills" mode="block-table" -->'
+const routingTableEnd = '<!-- partita:projection:end id="routing-table" -->'
+const legacyRoutingTableStart = '<!-- routing-table:start -->'
+const legacyRoutingTableEnd = '<!-- routing-table:end -->'
+const fileProjectionPrefix = '<!-- partita:projection:file '
+const blockProjectionStartPrefix = '<!-- partita:projection:start '
+const blockProjectionEndPrefix = '<!-- partita:projection:end '
 const namespaceShorthands = {
   primitive: 'pm',
 } as const
@@ -82,6 +89,7 @@ const requiredWikiFiles = [
   'wiki/skill/primitive.md',
   'wiki/skill/orchestrator.md',
   'wiki/skill/case/index.md',
+  'wiki/skill/case/insufficient-material.md',
   'wiki/skill/case/pattern.md',
   'wiki/skill/case/pressure.md',
   'wiki/skill/governance/index.md',
@@ -97,6 +105,7 @@ const requiredWikiFiles = [
   'wiki/projection/codex/frontmatter.md',
   'wiki/projection/codex/openai.md',
   'wiki/projection/codex/dispatcher.md',
+  'wiki/projection/codex/projection-marker.md',
   'wiki/projection/codex/references.md',
   'wiki/projection/codex/skill-md.md',
   'wiki/projection/verifier/index.md',
@@ -159,6 +168,7 @@ function buildSourceReport(root: string): ValidationReport {
     ...checkRouting(root, skills),
     ...checkRootMapFiles(root),
     ...checkWikiFiles(root),
+    ...checkProjectionMarkers(root),
     ...checkMarkdownLinks(root),
     ...checkWikiLinks(root),
     ...checkRemovedSurfaces(root),
@@ -193,8 +203,8 @@ function checkSkillFiles(root: string): { readonly descriptions: Record<string, 
 
     const description = validation.fields.description.trim()
     issues.push(...checkSkillDescription(description, relativePath))
-    if (!text.includes(loadedSkillMarker)) {
-      issues.push(issue('skill.missing_marker', `missing ${loadedSkillMarker} marker instruction`, relativePath))
+    if (!hasLoadedSkillMarker(text)) {
+      issues.push(issue('skill.missing_marker', `missing supported marker instruction: ${loadedSkillMarkers.join(', ')}`, relativePath))
     }
 
     issues.push(...checkSkillBodyShape(text, relativePath))
@@ -617,12 +627,129 @@ function checkRouting(root: string, skills: ReadonlySet<string>): ReadonlyArray<
     if (stale.length > 0) {
       issues.push(issue('routing.stale_skill_refs', `stale skill refs: ${stale.join(', ')}`, path))
     }
-    if (!text.includes(loadedSkillMarker)) {
-      issues.push(issue('routing.missing_marker', `missing ${loadedSkillMarker} marker`, path))
+    if (!hasLoadedSkillMarker(text)) {
+      issues.push(issue('routing.missing_marker', `missing supported marker: ${loadedSkillMarkers.join(', ')}`, path))
+    }
+    if (!text.includes(routingTableStart) || !text.includes(routingTableEnd)) {
+      issues.push(issue('routing.missing_projection_marker', 'dispatcher must use partita routing-table projection markers', path))
     }
   }
 
   return issues
+}
+
+function checkProjectionMarkers(root: string): ReadonlyArray<ValidationIssue> {
+  const issues: Array<ValidationIssue> = []
+  for (const path of markdownFiles(root)) {
+    const relativePath = relativePathFrom(root, path)
+    const text = readText(path)
+    if (text.includes(legacyRoutingTableStart) || text.includes(legacyRoutingTableEnd)) {
+      issues.push(issue('projection.legacy_marker', 'legacy routing-table marker is not allowed; use partita:projection markers', relativePath))
+    }
+
+    issues.push(...checkBlockProjectionMarkers(text, relativePath))
+    issues.push(...checkFileProjectionMarker(root, text, relativePath))
+  }
+  return issues
+}
+
+function checkBlockProjectionMarkers(text: string, relativePath: string): ReadonlyArray<ValidationIssue> {
+  const issues: Array<ValidationIssue> = []
+  const starts = projectionCommentLines(text, blockProjectionStartPrefix)
+  const ends = projectionCommentLines(text, blockProjectionEndPrefix)
+  const endCounts = new Map<string, number>()
+
+  for (const end of ends) {
+    const attrs = parseProjectionAttributes(end)
+    const id = attrs.id
+    if (!id) {
+      issues.push(issue('projection.block_end_missing_id', 'projection block end marker must include id', relativePath))
+      continue
+    }
+    endCounts.set(id, (endCounts.get(id) ?? 0) + 1)
+  }
+
+  for (const start of starts) {
+    const attrs = parseProjectionAttributes(start)
+    const id = attrs.id
+    if (!id || !attrs.source || !attrs.mode) {
+      issues.push(issue('projection.block_start_missing_attributes', 'projection block start marker must include id, source, and mode', relativePath))
+      continue
+    }
+    if (attrs.mode !== 'block-table') {
+      issues.push(issue('projection.unsupported_block_mode', `unsupported projection block mode: ${attrs.mode}`, relativePath))
+    }
+
+    const remaining = endCounts.get(id) ?? 0
+    if (remaining === 0) {
+      issues.push(issue('projection.block_end_missing', `missing projection block end marker for id=${id}`, relativePath))
+      continue
+    }
+    endCounts.set(id, remaining - 1)
+  }
+
+  for (const [id, count] of endCounts) {
+    if (count > 0) {
+      issues.push(issue('projection.block_start_missing', `missing projection block start marker for id=${id}`, relativePath))
+    }
+  }
+
+  return issues
+}
+
+function checkFileProjectionMarker(root: string, text: string, relativePath: string): ReadonlyArray<ValidationIssue> {
+  if (!text.startsWith(fileProjectionPrefix)) {
+    return []
+  }
+
+  const firstLine = text.split(/\r?\n/u, 1)[0] ?? ''
+  const attrs = parseProjectionAttributes(firstLine)
+  const source = attrs.source
+  if (!source || !attrs.mode) {
+    return [issue('projection.file_missing_attributes', 'file projection marker must include source and mode', relativePath)]
+  }
+  if (attrs.mode !== 'copy') {
+    return [issue('projection.unsupported_file_mode', `unsupported file projection mode: ${attrs.mode}`, relativePath)]
+  }
+  if (!validProjectionSource(source)) {
+    return [issue('projection.invalid_source', `invalid projection source: ${source}`, relativePath)]
+  }
+
+  const sourcePath = join(root, source)
+  if (!existsSync(sourcePath)) {
+    return [issue('projection.missing_source', `missing projection source: ${source}`, relativePath)]
+  }
+
+  const expected = `${fileProjectionHeader(source)}\n\n${readText(sourcePath)}`
+  return text === expected
+    ? []
+    : [issue('projection.file_drift', `file projection is out of sync with ${source}`, relativePath)]
+}
+
+function projectionCommentLines(text: string, prefix: string): ReadonlyArray<string> {
+  return text
+    .split(/\r?\n/u)
+    .filter(line => line.startsWith(prefix) && line.endsWith('-->'))
+}
+
+function parseProjectionAttributes(comment: string): Record<string, string> {
+  const attrs: Record<string, string> = {}
+  for (const match of comment.matchAll(/([a-z-]+)="([^"]*)"/gu)) {
+    const key = match[1]
+    const value = match[2]
+    if (key !== undefined && value !== undefined) {
+      attrs[key] = value
+    }
+  }
+  return attrs
+}
+
+function fileProjectionHeader(source: string): string {
+  return `<!-- partita:projection:file source="${source}" mode="copy" -->`
+}
+
+function validProjectionSource(source: string): boolean {
+  return !source.startsWith('/') && !source.split('/').includes('..') && source.endsWith('.md')
 }
 
 function checkWikiFiles(root: string): ReadonlyArray<ValidationIssue> {
@@ -894,6 +1021,10 @@ function markdownFiles(root: string): ReadonlyArray<string> {
   const files: Array<string> = []
   walk(root, files)
   return files.sort()
+}
+
+function hasLoadedSkillMarker(text: string): boolean {
+  return loadedSkillMarkers.some(marker => text.includes(marker))
 }
 
 function walk(path: string, files: Array<string>) {

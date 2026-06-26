@@ -1,125 +1,73 @@
 ---
 name: notate
-description: "Use when creating a new Partita primitive skill or re-founding a broken skill from a behavior motif into a legal source projection. Not for local retuning of an existing skill, installing skills, ordinary docs, or verifier implementation."
+description: "Use when creating an internal primitive skill from a real case with enough material for case pattern, pressure, governance action, and default failure. Not for public workflow skill creation, patching existing skills, external skill migration, abstract capability requests, hypothetical scenarios, or verifier implementation."
 ---
 
 # Notate
 
-Prefix your first user-facing line with `🧭` inline, not as its own paragraph,
-when this Partita skill is active.
+激活时，第一条用户可见行 MUST 以内联 `🎼 notate` 开头。
 
 ## Rule
 
-Facing a real behavior motif, correction, or broken primitive-shaped source,
-first score the A/Y/X governance assertion and V1 runtime projection, to avoid
-generic scaffolding, task-category skills, or valid-looking files that cannot
-change future agent behavior.
+面对足以创建 internal primitive skill 的真实 case 时，MUST 先写出它的 case pattern、pressure、governance action、default failure 和 source projection，避免创建 task category prompt、泛能力文件，或 runtime 合法但不能治理行为的 skill。
 
 ## Pattern
 
 Use when:
 
-- the user asks to create, name, design, or materialize a new Partita primitive
-  skill;
-- a workflow, correction, repeated drift, or behavior motif should become a
-  skill;
-- material must be placed in a skill, wiki node, verifier, reference, asset,
-  prompt/profile, or external harness;
-- an existing skill must be re-founded because its primitive identity is no
-  longer preserved.
+- 用户提供真实 case，且材料足以读出 case pattern、pressure、governance action 和 default failure。
+- 用户明确要从真实 case 创建新的 internal primitive skill。
+- 旧 skill 已被用户手动删除，旧材料只作为参考，当前目标是从真实 case 创建新的 internal primitive skill。
 
 Do not use when:
 
-- an existing valid skill only needs local trigger, boundary, workflow,
-  reference, metadata, or validation correction; use `retune`;
-- the task is only to install, list, or sync skills;
-- the output is one-off docs, notes, prompts, or project instructions;
-- the user asks for hard verifier, schema, CLI, or package implementation
-  without changing skill behavior.
+- 用户要创建 public workflow skill；使用 `conduct`。
+- 用户要 patch 已有且 identity 成立的 skill；使用 `retune`。
+- 用户只有抽象能力愿望、task category、假设场景，或外部 skill 迁移材料。
+- 用户要实现 verifier、CLI、schema、安装流程，或普通项目文档。
 
 ## Boundary
 
 Soft:
 
-- Decide whether the motif is strong enough to deserve a reusable skill.
-- Preserve one pressure and one governance action.
-- Separate primitive and orchestrator responsibilities.
-- Decide whether detail belongs in every-run `SKILL.md`, references, scripts,
-  assets, wiki, verifier, or external harness.
-- Treat proposed local edits to an existing valid skill as `retune`.
+- MUST require a real case before creating an internal primitive skill.
+- MUST reject material that cannot support case pattern、pressure、governance action 和 default failure.
+- MUST NOT invent case、pressure、A/Y/X 或 primitive identity。
+- MUST keep one pressure and one governance action per internal primitive skill.
+- MUST treat external skills and deleted old skills as references only, never as source of truth.
+- SHOULD ask only for the smallest missing case material when rejection is recoverable.
 
 Hard:
 
-- Do not materialize a skill before motif, default failure, governance action,
-  pattern, and exclusion boundary are clear enough to score.
-- Do not invent unsupported Codex skill frontmatter. Partita reads `name` and
-  `description`; official optional keys are `license`, `allowed-tools`, and
-  `metadata`.
-- Do not put namespace, plugin name, area, status, or kind metadata in
-  frontmatter.
-- Every Partita skill must include `agents/openai.yaml` with
-  `policy.allow_implicit_invocation`.
-- Generated dispatcher metadata, `partita verify`, tests, `pnpm verify`, and
-  Effect harness verification are hard script checks for this repo.
+- Run `pnpm generate:check` after changing skill frontmatter, `agents/openai.yaml`, dispatcher inputs, or generated projection targets.
+- Run `pnpm verify` before finishing repo changes.
 
 ## Effects
 
-- Conversation: may show the `🧭` marker, motif, assertion, source path,
-  projected handle, verification report, and blockers.
-- Filesystem: may create or re-found `SKILL.md`, `agents/openai.yaml`,
-  `scripts/`, `references/`, `assets/`, wiki nodes, generated dispatcher
-  metadata, tests, and verifier surfaces inside the approved skill scope.
-- External: none unless the user explicitly makes an external harness or source
-  dependency part of the skill.
+- Conversation: MAY show `🎼 notate`, rejection reason, A/Y/X assertion, source path, projected handle, and verification result.
+- Filesystem: MAY create one internal primitive skill under `skills/primitive/<name>/`, its `agents/openai.yaml`, local references, and directly required generated projections.
+- External: none.
 
 ## Workflow
 
-1. Read the real case or motif. If none exists, ask for the smallest behavior
-   source needed to avoid generic scaffolding.
-2. Write the assertion: facing case pattern `A`, first governance action `Y`, to
-   avoid default failure `X`.
-3. Decide artifact layer: `skill`, `wiki`, `CLI/verifier`, `reference`, `asset`,
-   `prompt/profile`, or external harness.
-4. Decide primitive versus orchestrator.
-5. Choose source namespace and handle. For primitive skills, use
-   `skills/primitive/<name>/SKILL.md`; the projected handle is `pm:<name>`.
-6. Project V1 `SKILL.md`: `Rule`, `Pattern`, `Boundary`, `Effects`,
-   `Workflow`, `References`, and `Validation`.
-7. Create or update `agents/openai.yaml`, bundled resources, wiki nodes,
-   generated dispatcher metadata, tests, and verifier surfaces as needed.
-8. Run generation and hard verification, including Effect harness verification
-   through `pnpm verify` for this repo.
-9. Report the motif, assertion, source path, projected handle, changed files,
-   verification result, and blockers.
+1. Read the real case. If material is insufficient, MUST use the local insufficient-material reference and stop.
+2. Read case pattern、pressure、governance action 和 default failure from the case.
+3. Confirm the target is an internal primitive skill; otherwise route to `conduct` or `retune`.
+4. Create the source projection: `SKILL.md`, `agents/openai.yaml`, and required local references.
+5. Run the required Hard checks or report the exact blocker.
 
 ## References
 
-- Read [create practice](../../../wiki/practice/create.md) before creating a new
-  skill.
-- Read [assertion](../../../wiki/skill/assertion.md),
-  [primitive](../../../wiki/skill/primitive.md), and
-  [governance identity](../../../wiki/skill/governance/identity.md) before
-  naming a skill.
-- Read [orchestrator](../../../wiki/skill/orchestrator.md) before allowing
-  workflow composition.
-- Read [skill-md](../../../wiki/projection/codex/skill-md.md),
-  [runtime projection](../../../wiki/projection/runtime.md), and
-  [OpenAI metadata](../../../wiki/projection/codex/openai.md) before writing
-  files.
+- 材料不足时，MUST use [insufficient material](references/insufficient-material.md).
 
 ## Validation
 
 Before done:
 
-- the first user-facing line includes `🧭` inline;
-- the motif, A/Y/X assertion, and governance action are explicit;
-- skill identity follows the governance action, not task category, plugin
-  namespace, gate name, or runtime file;
-- primitive and orchestrator responsibilities are separated;
-- `Pattern` includes positive use cases and exclusions;
-- `Boundary`, `Effects`, `Workflow`, `References`, and `Validation` follow V1
-  shape;
-- the source path and projected handle are correct for the namespace;
-- generated dispatcher metadata is in sync;
-- `pnpm generate`, `pnpm verify`, and Effect harness verification pass, or exact
-  environment blockers are reported.
+- `🎼 notate` is visible when this skill is active;
+- the input was a real case, or insufficient material was rejected;
+- case pattern、pressure、governance action 和 default failure are explicit before file creation;
+- the created skill is an internal primitive with `policy.allow_implicit_invocation: false`;
+- no public workflow skill, existing-skill patch, external migration, or verifier implementation was created by `notate`;
+- Effects stayed within the declared filesystem scope;
+- required Hard checks passed, or exact blockers were reported.

@@ -42,7 +42,8 @@ This repo does not own:
   external harnesses or target repos are managed projections and must not
   redefine the skill.
 - `partita` is the product and plugin name, not a skill prefix. The `primitive`
-  namespace projects as `pm:<name>` in dispatcher and plugin-facing handles.
+  source namespace is the current Partita-managed base layer and projects as
+  `pm:<name>` in dispatcher and plugin-facing handles.
   Codex global skill installation is flat by frontmatter `name`, so
   `skills/primitive/notate/SKILL.md` installs as `notate`; the source family
   remains in this repo and dispatcher projection.
@@ -54,7 +55,7 @@ This repo does not own:
 - Before changing skill names, trigger policy, harness install behavior, global
   skill state, or marker conventions, use an interpretation gate if the user's
   instruction can be read more than one way.
-- If a new primitive skill is added, create
+- If a new Partita-managed base skill is added, create
   `skills/primitive/<name>/SKILL.md` and
   `skills/primitive/<name>/agents/openai.yaml`, run `pnpm generate`, then run
   `pnpm verify`. Effect harness verification is part of the hard verification

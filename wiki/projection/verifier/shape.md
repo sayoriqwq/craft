@@ -27,7 +27,7 @@ discoverable from `SKILL.md`. `scripts/` and `assets/` are bundled resources and
 may contain implementation or output files.
 
 Supported namespace roots under `skills/` are verifier-owned. Current namespace:
-`primitive`, projected as `pm:<name>`.
+`primitive`, the Partita-managed base source family projected as `pm:<name>`.
 
 Hard verification surfaces include generated-file checks, `partita verify`,
 tests, package checks, and Effect harness verification when the target uses the

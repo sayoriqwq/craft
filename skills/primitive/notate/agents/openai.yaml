@@ -1,6 +1,6 @@
 interface:
   display_name: "Notate"
-  short_description: "Score a behavior motif into a primitive skill"
-  default_prompt: "Use pm:notate to turn this behavior motif into a legal Partita skill projection."
+  short_description: "Create an internal primitive skill from a real case"
+  default_prompt: "Use pm:notate to create an internal primitive skill from this real case."
 policy:
-  allow_implicit_invocation: true
+  allow_implicit_invocation: false

@@ -137,7 +137,7 @@ unsupported_field: Demo routing
       const packageFile = requireElement(files, 1)
       const dispatcherFile = requireElement(files, 2)
 
-      assert.include(dispatcherFile.content, '| Skill | Description | File |')
+      assert.include(dispatcherFile.content, '| Handle | Name | Invocation | Description | File |')
       assert.notInclude(dispatcherFile.content, 'skills/demo/SKILL.md')
 
       const pluginJson = JSON.parse(pluginFile.content) as { version: string, skills: string }
@@ -168,16 +168,19 @@ name: bravo
 description: "Use when bravo is needed. Not for unrelated work."
 ---
 `,
+        'skills/bravo/agents/openai.yaml': openAiMetadata(true),
         'skills/alpha/SKILL.md': `---
 name: alpha
 description: "Use when alpha is needed. Not for unrelated work."
 ---
 `,
+        'skills/alpha/agents/openai.yaml': openAiMetadata(false),
         'skills/primitive/notate/SKILL.md': `---
 name: notate
 description: "Use when notating a skill is needed. Not for local retuning."
 ---
 `,
+        'skills/primitive/notate/agents/openai.yaml': openAiMetadata(false),
       })
 
       const skills = yield* collectSkillMetadata(root)
@@ -188,6 +191,10 @@ description: "Use when notating a skill is needed. Not for local retuning."
       assert.deepStrictEqual(
         skills.map(skill => skill.handle),
         ['alpha', 'bravo', 'pm:notate'],
+      )
+      assert.deepStrictEqual(
+        skills.map(skill => skill.allowImplicitInvocation),
+        [false, true, false],
       )
       assert.strictEqual(requireElement(skills, 0).description, 'Use when alpha is needed. Not for unrelated work.')
       assert.strictEqual(requireElement(skills, 1).description, 'Use when bravo is needed. Not for unrelated work.')
@@ -217,11 +224,13 @@ name: demo
 description: "Use when demo is needed. Not for unrelated work."
 ---
 `,
+        'skills/demo/agents/openai.yaml': openAiMetadata(true),
         'skills/primitive/notate/SKILL.md': `---
 name: notate
 description: "Use when notating a skill is needed. Not for local retuning."
 ---
 `,
+        'skills/primitive/notate/agents/openai.yaml': openAiMetadata(false),
       })
       const fs = yield* FileSystem.FileSystem
 
@@ -236,8 +245,9 @@ description: "Use when notating a skill is needed. Not for local retuning."
       )
 
       const dispatcher = yield* fs.readFileString(joinPath(root, 'skills', 'DISPATCHER.md'))
-      assert.include(dispatcher, '| demo | Use when demo is needed. Not for unrelated work. | `skills/demo/SKILL.md` |')
-      assert.include(dispatcher, '| pm:notate | Use when notating a skill is needed. Not for local retuning. | `skills/primitive/notate/SKILL.md` |')
+      assert.include(dispatcher, '<!-- partita:projection:start id="routing-table" source="skills" mode="block-table" -->')
+      assert.include(dispatcher, '| demo | demo | true | Use when demo is needed. Not for unrelated work. | `skills/demo/SKILL.md` |')
+      assert.include(dispatcher, '| pm:notate | notate | false | Use when notating a skill is needed. Not for local retuning. | `skills/primitive/notate/SKILL.md` |')
 
       const checks = yield* checkGeneratedFiles(root)
       assert.deepStrictEqual(
@@ -251,4 +261,58 @@ description: "Use when notating a skill is needed. Not for local retuning."
         ['ok', 'ok', 'ok'],
       )
     }).pipe(Effect.provide(NodeFileSystem.layer))))
+
+  it.effect('projects wiki sources into runtime references', () =>
+    Effect.scoped(Effect.gen(function* () {
+      const root = yield* makeRepo({
+        'package.json': JSON.stringify({ version: '0.2.0' }),
+        '.effect-harness.json': effectHarnessManifest,
+        'wiki/skill/case/insufficient-material.md': '# 材料不足\n\nMUST 打回。\n',
+        'skills/demo/SKILL.md': `---
+name: demo
+description: "Use when demo is needed. Not for unrelated work."
+---
+`,
+        'skills/demo/agents/openai.yaml': openAiMetadata(false),
+        'skills/demo/references/insufficient-material.md': '<!-- partita:projection:file source="wiki/skill/case/insufficient-material.md" mode="copy" -->\n',
+      })
+      const fs = yield* FileSystem.FileSystem
+
+      const files = yield* renderGeneratedFiles(root)
+      assert.isTrue(files.some(file => file.relativePath === 'skills/demo/references/insufficient-material.md'))
+
+      const results = yield* writeGeneratedFiles(root)
+      assert.deepStrictEqual(
+        results.map(result => [result.relativePath, result.status]),
+        [
+          ['.codex-plugin/plugin.json', 'written'],
+          ['package.json', 'written'],
+          ['skills/DISPATCHER.md', 'written'],
+          ['skills/demo/references/insufficient-material.md', 'written'],
+        ],
+      )
+
+      const projected = yield* fs.readFileString(joinPath(root, 'skills', 'demo', 'references', 'insufficient-material.md'))
+      assert.strictEqual(
+        projected,
+        '<!-- partita:projection:file source="wiki/skill/case/insufficient-material.md" mode="copy" -->\n\n# 材料不足\n\nMUST 打回。\n',
+      )
+
+      const checks = yield* checkGeneratedFiles(root)
+      assert.deepStrictEqual(
+        checks.map(check => check.status),
+        ['ok', 'ok', 'ok', 'ok'],
+      )
+    }).pipe(Effect.provide(NodeFileSystem.layer))))
 })
+
+function openAiMetadata(allowImplicitInvocation: boolean): string {
+  return [
+    'interface:',
+    '  display_name: "Demo"',
+    '  short_description: "Demo skill fixture"',
+    '  default_prompt: "Use $demo for verifier tests."',
+    'policy:',
+    `  allow_implicit_invocation: ${String(allowImplicitInvocation)}`,
+  ].join('\n')
+}

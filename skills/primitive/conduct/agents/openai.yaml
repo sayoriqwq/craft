@@ -1,0 +1,6 @@
+interface:
+  display_name: "Conduct"
+  short_description: "Create a public workflow skill from a real workflow case"
+  default_prompt: "Use pm:conduct to create a public workflow skill from this real workflow case."
+policy:
+  allow_implicit_invocation: false

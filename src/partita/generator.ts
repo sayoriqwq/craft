@@ -4,8 +4,9 @@ import { Effect, FileSystem } from 'effect'
 import { readSkillFrontmatter } from './frontmatter.ts'
 import { PartitaGeneratorError } from './model.ts'
 
-const ROUTING_TABLE_START = '<!-- routing-table:start -->'
-const ROUTING_TABLE_END = '<!-- routing-table:end -->'
+const ROUTING_TABLE_START = '<!-- partita:projection:start id="routing-table" source="skills" mode="block-table" -->'
+const ROUTING_TABLE_END = '<!-- partita:projection:end id="routing-table" -->'
+const FILE_COPY_PROJECTION_PATTERN = /^<!-- partita:projection:file source="([^"]+)" mode="copy" -->\r?\n/u
 const namespaceShorthands = {
   primitive: 'pm',
 } as const
@@ -13,6 +14,7 @@ const namespaceShorthands = {
 type SkillNamespace = keyof typeof namespaceShorthands
 
 export interface SourceSkillMetadata extends SkillMetadata {
+  readonly allowImplicitInvocation: boolean
   readonly handle: string
   readonly relativePath: string
 }
@@ -65,6 +67,10 @@ function parentPath(path: string): string {
   return path.slice(0, index)
 }
 
+function fileCopyProjectionHeader(source: string): string {
+  return `<!-- partita:projection:file source="${source}" mode="copy" -->`
+}
+
 const renderJson = (value: unknown): string => `${JSON.stringify(value, null, 2)}\n`
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -83,6 +89,63 @@ function skillHandle(namespace: SkillNamespace | undefined, name: string): strin
 
 function isSkillNamespace(value: string): value is SkillNamespace {
   return Object.hasOwn(namespaceShorthands, value)
+}
+
+const readAllowImplicitInvocation = Effect.fn('readAllowImplicitInvocation')(function* (metadataPath: string) {
+  const fs = yield* FileSystem.FileSystem
+  const exists = yield* pathExists(fs, metadataPath)
+  if (!exists) {
+    return yield* failGenerator(metadataPath, `ERROR: missing OpenAI metadata: ${metadataPath}`)
+  }
+
+  const value = parseAllowImplicitInvocation(yield* fs.readFileString(metadataPath))
+  if (value === undefined) {
+    return yield* failGenerator(metadataPath, `ERROR: ${metadataPath} must declare policy.allow_implicit_invocation as true or false`)
+  }
+  return value
+})
+
+function parseAllowImplicitInvocation(text: string): boolean | undefined {
+  let currentSection: string | undefined
+  for (const rawLine of text.split(/\r?\n/u)) {
+    if (!rawLine.trim() || rawLine.trimStart().startsWith('#')) {
+      continue
+    }
+
+    const indent = rawLine.length - rawLine.trimStart().length
+    const line = rawLine.trim()
+    const separator = line.indexOf(':')
+    if (separator === -1) {
+      continue
+    }
+
+    const key = line.slice(0, separator)
+    const rawValue = line.slice(separator + 1).trim()
+    if (indent === 0) {
+      currentSection = rawValue ? undefined : key
+      continue
+    }
+
+    if (indent === 2 && currentSection === 'policy' && key === 'allow_implicit_invocation') {
+      const value = unquoteScalar(rawValue)
+      if (value === 'true') {
+        return true
+      }
+      if (value === 'false') {
+        return false
+      }
+      return undefined
+    }
+  }
+  return undefined
+}
+
+function unquoteScalar(value: string): string {
+  const quote = value[0]
+  if (value.length >= 2 && quote !== undefined && (quote === '"' || quote === '\'') && value.endsWith(quote)) {
+    return value.slice(1, -1)
+  }
+  return value
 }
 
 function requireRecord(value: unknown, path: string, field: string) {
@@ -118,8 +181,10 @@ export const collectSkillMetadata = Effect.fn('collectSkillMetadata')(function* 
           `ERROR: ${skillPath} frontmatter name=${JSON.stringify(fields.name)} != directory ${JSON.stringify(entry)}`,
         )
       }
+      const allowImplicitInvocation = yield* readAllowImplicitInvocation(joinPath(parentPath(skillPath), 'agents', 'openai.yaml'))
       skills.push({
         ...fields,
+        allowImplicitInvocation,
         handle: skillHandle(undefined, fields.name),
         relativePath: `skills/${entry}/SKILL.md`,
       })
@@ -145,8 +210,10 @@ export const collectSkillMetadata = Effect.fn('collectSkillMetadata')(function* 
           `ERROR: ${namespacedSkillPath} frontmatter name=${JSON.stringify(fields.name)} != directory ${JSON.stringify(skillName)}`,
         )
       }
+      const allowImplicitInvocation = yield* readAllowImplicitInvocation(joinPath(parentPath(namespacedSkillPath), 'agents', 'openai.yaml'))
       skills.push({
         ...fields,
+        allowImplicitInvocation,
         handle: skillHandle(entry, fields.name),
         relativePath: `skills/${entry}/${skillName}/SKILL.md`,
       })
@@ -294,9 +361,9 @@ const renderDispatcher = Effect.fn('renderDispatcher')(function* (
     return yield* failGenerator('skills/DISPATCHER.md', 'ERROR: dispatcher template is missing routing-table markers')
   }
 
-  const rows = ['| Skill | Description | File |', '|-------|-------------|------|']
+  const rows = ['| Handle | Name | Invocation | Description | File |', '|--------|------|------------|-------------|------|']
   for (const skill of [...skills].sort((left, right) => left.handle.localeCompare(right.handle))) {
-    rows.push(`| ${skill.handle} | ${markdownTableCell(skill.description)} | \`${skill.relativePath}\` |`)
+    rows.push(`| ${skill.handle} | ${skill.name} | ${String(skill.allowImplicitInvocation)} | ${markdownTableCell(skill.description)} | \`${skill.relativePath}\` |`)
   }
 
   const block = `${ROUTING_TABLE_START}\n${rows.join('\n')}\n${ROUTING_TABLE_END}`
@@ -307,11 +374,70 @@ function markdownTableCell(value: string): string {
   return value.replace(/\s+/g, ' ').replaceAll('|', '\\|').trim()
 }
 
+const renderFileCopyProjections = Effect.fn('renderFileCopyProjections')(function* (
+  root: string,
+  skills: ReadonlyArray<SourceSkillMetadata>,
+) {
+  const fs = yield* FileSystem.FileSystem
+  const files: Array<GeneratedFile> = []
+
+  for (const skill of skills) {
+    const skillDir = parentPath(joinPath(root, skill.relativePath))
+    const referencesDir = joinPath(skillDir, 'references')
+    const referencesExist = yield* pathExists(fs, referencesDir)
+    if (!referencesExist) {
+      continue
+    }
+
+    const referenceEntries = [...(yield* fs.readDirectory(referencesDir))].sort()
+    for (const entry of referenceEntries) {
+      const targetPath = joinPath(referencesDir, entry)
+      const info = yield* fs.stat(targetPath)
+      if (info.type !== 'File') {
+        continue
+      }
+
+      const targetText = yield* fs.readFileString(targetPath)
+      const source = fileCopyProjectionSource(targetText)
+      if (source === undefined) {
+        continue
+      }
+      if (!validProjectionSource(source)) {
+        return yield* failGenerator(targetPath, `ERROR: invalid file projection source: ${source}`)
+      }
+
+      const sourcePath = joinPath(root, source)
+      const sourceExists = yield* pathExists(fs, sourcePath)
+      if (!sourceExists) {
+        return yield* failGenerator(targetPath, `ERROR: missing file projection source: ${source}`)
+      }
+
+      const sourceText = yield* fs.readFileString(sourcePath)
+      files.push({
+        relativePath: `${parentPath(skill.relativePath)}/references/${entry}`,
+        path: targetPath,
+        content: `${fileCopyProjectionHeader(source)}\n\n${sourceText}`,
+      })
+    }
+  }
+
+  return files.sort((left, right) => left.relativePath.localeCompare(right.relativePath))
+})
+
+function fileCopyProjectionSource(text: string): string | undefined {
+  return FILE_COPY_PROJECTION_PATTERN.exec(text)?.[1]
+}
+
+function validProjectionSource(source: string): boolean {
+  return !source.startsWith('/') && !source.split('/').includes('..') && source.endsWith('.md')
+}
+
 export const renderGeneratedFiles = Effect.fn('renderGeneratedFiles')(function* (root: string) {
   const version = yield* readPackageVersion(root)
   const skills = yield* collectSkillMetadata(root)
   const packageJson = yield* renderPackageJson(root, version)
   const dispatcher = yield* renderDispatcher(dispatcherTemplate, skills)
+  const projectedReferences = yield* renderFileCopyProjections(root, skills)
 
   return [
     {
@@ -329,6 +455,7 @@ export const renderGeneratedFiles = Effect.fn('renderGeneratedFiles')(function* 
       path: joinPath(root, 'skills', 'DISPATCHER.md'),
       content: dispatcher,
     },
+    ...projectedReferences,
   ] satisfies Array<GeneratedFile>
 })
 

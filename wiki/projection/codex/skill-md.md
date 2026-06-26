@@ -22,5 +22,5 @@ Source namespaces come from path structure, not frontmatter. For example,
 `pm:notate`.
 
 Codex global skill installation is flat. The same source skill installs as
-`notate`; `primitive` remains a Partita source family, not a global install
-directory.
+`notate`; `primitive` remains the current Partita-managed base source family,
+not a global install directory.

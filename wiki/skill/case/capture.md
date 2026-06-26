@@ -10,5 +10,5 @@ default failure
 governance reference
 ```
 
-Do not invent cases for structure audits. Use [[practice/audit]] when there is
-no real case.
+Do not invent cases. If case-rooted skill work lacks a real case, use
+[[skill/case/insufficient-material]] and stop.
