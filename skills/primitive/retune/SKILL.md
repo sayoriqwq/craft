@@ -24,7 +24,7 @@ Do not use when:
 - 用户要创建 internal primitive skill；使用 `notate`。
 - 用户要创建 public workflow skill；使用 `conduct`。
 - 用户只要求 structure-audit，且没有真实 patch case。
-- 目标 skill identity 不成立；MUST stop and report，删除旧 skill 是用户或普通文件操作。
+- 目标 skill identity 不成立；MUST 停止并报告，删除旧 skill 是用户或普通文件操作。
 - 用户要改造外部 skill 进入 Partita；外部 skill 只能作为创建新 skill 的参考材料。
 - 用户要普通 code review、bug fix、prose cleanup、verifier/schema/CLI implementation。
 
@@ -32,45 +32,47 @@ Do not use when:
 
 Soft:
 
-- MUST require a real patch case before changing a skill.
-- MUST identify the target skill and the stale surface exposed by the case.
-- MUST preserve the target skill identity.
-- MUST stop and report when target identity is invalid; MUST NOT patch it.
-- MUST NOT run structure-audit without a real case.
-- MUST choose the smallest recurrence-preventing patch.
-- SHOULD keep concrete case detail in references when it is needed for recurrence.
+- MUST 在修改 skill 前要求真实 patch case。
+- MUST 识别 target skill 和 case 暴露的 stale surface。
+- MUST 保持 target skill identity。
+- target identity 不成立时，MUST 停止并报告；MUST NOT patch 它。
+- 没有真实 case 时，MUST NOT 运行 structure-audit。
+- MUST 选择能防止复发的最小 patch。
+- 当复发判断需要具体 case detail 时，SHOULD 把它保留在 references。
 
 Hard:
 
-- Run `pnpm generate:check` after changing skill frontmatter, `agents/openai.yaml`, dispatcher inputs, or generated projection targets.
-- Run `pnpm verify` before finishing repo changes.
+- When: 修改 skill frontmatter、`agents/openai.yaml`、dispatcher 输入或 generated projection target。
+  Do: MUST 运行 `pnpm generate:check`。
+
+- When: 完成 repo 变更前。
+  Do: MUST 运行 `pnpm verify`。
 
 ## Effects
 
-- Conversation: MAY show `🎼 retune`, target skill, patch case summary, stale surface, changed rule, and verification result.
-- Filesystem: MAY update only the target skill, directly stale local references, `agents/openai.yaml`, and directly required generated projections.
+- Conversation: MAY 展示 target skill、patch case summary、stale surface、变更后的 rule 和验证结果。
+- Filesystem: MAY 只更新 target skill、直接 stale 的本地 references、`agents/openai.yaml` 和直接需要的 generated projections。
 - External: none.
 
 ## Workflow
 
-1. Read the target skill and real patch case. If material is insufficient, MUST use the local insufficient-material reference and stop.
-2. Confirm the target skill identity still holds. If not, MUST stop and report identity invalid.
-3. Locate the smallest stale surface exposed by the case.
-4. Patch only that stale surface and directly synchronized metadata or projections.
-5. Run the required Hard checks or report the exact blocker.
+1. 读取 target skill 和真实 patch case。材料不足时，MUST 使用本地 insufficient-material reference 并停止。
+2. 确认 target skill identity 仍然成立；否则 MUST 停止并报告 identity invalid。
+3. 定位 case 暴露的最小 stale surface。
+4. 只 patch 该 stale surface，以及直接需要同步的 metadata 或 projections。
+5. 运行要求的 Hard checks，或报告准确 blocker。
 
 ## References
 
-- 材料不足时，MUST use [insufficient material](references/insufficient-material.md).
+- 材料不足时，MUST 使用 [insufficient material](references/insufficient-material.md)。
 
 ## Validation
 
 Before done:
 
-- `🎼 retune` is visible when this skill is active;
-- a real patch case and target skill were identified, or insufficient material was rejected;
-- the target identity still holds before patching;
-- the patch is smaller than a rewrite and limited to the stale surface exposed by the case;
-- no structure-audit, external skill migration, new skill creation, or identity repair was performed by `retune`;
-- Effects stayed within the declared filesystem scope;
-- required Hard checks passed, or exact blockers were reported.
+- 已识别真实 patch case 和 target skill，或材料不足已被打回；
+- patch 前 target identity 仍然成立；
+- patch 小于 rewrite，且限制在 case 暴露的 stale surface 内；
+- `retune` 没有执行 structure-audit、外部 skill 迁移、新 skill 创建或 identity repair；
+- Effects 保持在声明的 filesystem scope 内；
+- 要求的 Hard checks 已通过，或准确 blocker 已报告。

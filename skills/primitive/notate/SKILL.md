@@ -30,44 +30,46 @@ Do not use when:
 
 Soft:
 
-- MUST require a real case before creating an internal primitive skill.
-- MUST reject material that cannot support case pattern、pressure、governance action 和 default failure.
-- MUST NOT invent case、pressure、A/Y/X 或 primitive identity。
-- MUST keep one pressure and one governance action per internal primitive skill.
-- MUST treat external skills and deleted old skills as references only, never as source of truth.
-- SHOULD ask only for the smallest missing case material when rejection is recoverable.
+- MUST 在创建 internal primitive skill 前要求真实 case。
+- MUST 打回不能支撑 case pattern、pressure、governance action 和 default failure 的材料。
+- MUST NOT 编造 case、pressure、A/Y/X 或 primitive identity。
+- MUST 保持每个 internal primitive skill 只有一个 pressure 和一个 governance action。
+- MUST 只把外部 skill 和已删除旧 skill 当作参考，不能当作 source of truth。
+- 如果材料不足但可补救，SHOULD 只询问最小缺失 case material。
 
 Hard:
 
-- Run `pnpm generate:check` after changing skill frontmatter, `agents/openai.yaml`, dispatcher inputs, or generated projection targets.
-- Run `pnpm verify` before finishing repo changes.
+- When: 修改 skill frontmatter、`agents/openai.yaml`、dispatcher 输入或 generated projection target。
+  Do: MUST 运行 `pnpm generate:check`。
+
+- When: 完成 repo 变更前。
+  Do: MUST 运行 `pnpm verify`。
 
 ## Effects
 
-- Conversation: MAY show `🎼 notate`, rejection reason, A/Y/X rule, source path, projected handle, and verification result.
-- Filesystem: MAY create one internal primitive skill under `skills/primitive/<name>/`, its `agents/openai.yaml`, local references, and directly required generated projections.
+- Conversation: MAY 展示打回原因、A/Y/X rule、source path、projected handle 和验证结果。
+- Filesystem: MAY 在 `skills/primitive/<name>/` 下创建一个 internal primitive skill、它的 `agents/openai.yaml`、本地 references 和直接需要的 generated projections。
 - External: none.
 
 ## Workflow
 
-1. Read the real case. If material is insufficient, MUST use the local insufficient-material reference and stop.
-2. Read case pattern、pressure、governance action 和 default failure from the case.
-3. Confirm the target is an internal primitive skill; otherwise route to `conduct` or `retune`.
-4. Create the source projection: `SKILL.md`, `agents/openai.yaml`, and required local references.
-5. Run the required Hard checks or report the exact blocker.
+1. 读取真实 case。材料不足时，MUST 使用本地 insufficient-material reference 并停止。
+2. 从 case 中读出 case pattern、pressure、governance action 和 default failure。
+3. 确认目标是 internal primitive skill；否则路由到 `conduct` 或 `retune`。
+4. 创建 source projection：`SKILL.md`、`agents/openai.yaml` 和必要本地 references。
+5. 运行要求的 Hard checks，或报告准确 blocker。
 
 ## References
 
-- 材料不足时，MUST use [insufficient material](references/insufficient-material.md).
+- 材料不足时，MUST 使用 [insufficient material](references/insufficient-material.md)。
 
 ## Validation
 
 Before done:
 
-- `🎼 notate` is visible when this skill is active;
-- the input was a real case, or insufficient material was rejected;
-- case pattern、pressure、governance action 和 default failure are explicit before file creation;
-- the created skill is an internal primitive with `policy.allow_implicit_invocation: false`;
-- no public workflow skill, existing-skill patch, external migration, or verifier implementation was created by `notate`;
-- Effects stayed within the declared filesystem scope;
-- required Hard checks passed, or exact blockers were reported.
+- 输入是真实 case，或材料不足已被打回；
+- 创建文件前，case pattern、pressure、governance action 和 default failure 已明确；
+- 创建的 skill 是 `policy.allow_implicit_invocation: false` 的 internal primitive；
+- `notate` 没有创建 public workflow skill、已有 skill patch、外部迁移或 verifier implementation；
+- Effects 保持在声明的 filesystem scope 内；
+- 要求的 Hard checks 已通过，或准确 blocker 已报告。

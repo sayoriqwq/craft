@@ -33,59 +33,61 @@ Do not use when:
 
 Soft:
 
-- MUST read the relevant local preference references before creating or modifying Markdown.
-- MUST treat `assertion` as a single reviewable semantic judgment, not as proof of correctness.
-- MUST treat each `.md` file as a `module`.
-- MUST preserve module boundary: one module owns the assertions it should carry and rejects assertions outside that responsibility.
-- MUST use frontmatter metadata for sayoriqwq-style docs unless a higher-priority rule forbids it.
-- MUST choose `audience` before choosing pattern-heavy or description-heavy writing.
-- MUST use simplified Chinese as the main content language.
-- SHOULD use short English words or phrases for section names.
-- SHOULD prefer OFM wiki links when the target documentation system supports them.
-- SHOULD keep path and filename short, scoped, and non-redundant.
+- MUST 在创建或修改 Markdown 前读取相关本地 preference references。
+- MUST 把 `assertion` 当作一条可单独审查的语义判断，而不是正确性证明。
+- MUST 把每个 `.md` 文件当作一个 `module`。
+- MUST 维护 module boundary：一个 module 负责承载其职责内 assertions，并拒绝职责外 assertions。
+- 除非更高优先级规则禁止，sayoriqwq-style docs MUST 使用 frontmatter metadata。
+- MUST 先选择 `audience`，再决定偏 pattern 还是偏 description。
+- MUST 使用简体中文作为主内容语言。
+- section 名称 SHOULD 使用简短英文词或短语。
+- 目标文档系统支持 OFM wiki link 时，SHOULD 优先使用 OFM。
+- path 和 filename SHOULD 短、符合 scope、且不重复父级语义。
 
 Hard:
 
-- Run `pnpm generate:check` after changing projected references, dispatcher inputs, generated projection targets, or skill metadata.
-- Run `pnpm verify` before finishing repo changes.
+- When: 修改 projected references、dispatcher 输入、generated projection target 或 skill metadata。
+  Do: MUST 运行 `pnpm generate:check`。
+
+- When: 完成 repo 变更前。
+  Do: MUST 运行 `pnpm verify`。
 
 ## Effects
 
-- Conversation: MAY show `🎼 score`, applied preference blocks, preference conflict, and verification result.
-- Filesystem: MAY create or update Markdown docs, wiki documentation nodes, skill-local projected references, and directly required generated projections.
+- Conversation: MAY 展示已应用的 preference blocks、preference conflict 和验证结果。
+- Filesystem: MAY 创建或更新 Markdown docs、wiki documentation nodes、skill-local projected references 和直接需要的 generated projections。
 - External: none.
 
 ## Workflow
 
-1. Read the local preference references relevant to the Markdown surface being created or modified.
-2. Identify the target module and its boundary.
-3. Choose or maintain metadata, especially `audience`, before shaping the body.
-4. Organize assertions under sections; keep headings as section openers rather than assertions.
-5. Apply language、keywords、pattern、path 和 links preferences.
-6. Run required checks for the changed surface, or report the exact blocker.
+1. 读取与当前 Markdown surface 相关的本地 preference references。
+2. 识别 target module 及其 boundary。
+3. 在组织正文前，选择或维护 metadata，尤其是 `audience`。
+4. 用 sections 组织 assertions；heading 只打开 section，不当作 assertion。
+5. 应用 language、keywords、pattern、path 和 links preferences。
+6. 运行当前变更 surface 需要的 checks，或报告准确 blocker。
 
 ## References
 
-- Read [assertion](references/assertion.md) for reviewable semantic judgments.
-- Read [module](references/module.md) for `.md` file scope.
-- Read [boundary](references/boundary.md) for single-responsibility module boundaries.
-- Read [section](references/section.md) for heading-opened local contexts.
-- Read [language](references/language.md) for Chinese body and English section naming.
-- Read [keywords](references/keywords.md) for normative keyword strength.
-- Read [metadata](references/metadata.md) for frontmatter fields.
-- Read [audience](references/audience.md) before choosing pattern-heavy or description-heavy writing.
-- Read [pattern](references/pattern.md) for agent-facing structures.
-- Read [path](references/path.md) for index and short scoped filenames.
-- Read [links](references/links.md) for OFM-first linking.
+- 需要可单独审查的语义判断时，读取 [assertion](references/assertion.md)。
+- 需要 `.md` 文件作用域时，读取 [module](references/module.md)。
+- 需要单一职责 module boundary 时，读取 [boundary](references/boundary.md)。
+- 需要由 heading 打开的局部上下文时，读取 [section](references/section.md)。
+- 需要中文正文和英文 section naming 时，读取 [language](references/language.md)。
+- 需要 normative keyword 强度时，读取 [keywords](references/keywords.md)。
+- 需要 frontmatter fields 时，读取 [metadata](references/metadata.md)。
+- 在选择偏 pattern 还是偏 description 前，读取 [audience](references/audience.md)。
+- 需要 agent-facing structures 或 template 定义时，读取 [pattern](references/pattern.md)。
+- 需要 index 和短 scope filename 时，读取 [path](references/path.md)。
+- 需要 OFM-first linking 时，读取 [links](references/links.md)。
 
 ## Validation
 
 Before done:
 
-- `🎼 score` is visible when this skill is active;
-- the target surface is Markdown;
-- relevant local preference references were applied;
-- metadata, audience, module boundary, sections, assertions, language, keywords, pattern, path, and links were handled when the change touched them;
-- no non-Markdown prose polish, product copy, workflow skill, primitive skill, skill patch, code comment, commit message, PR description, or issue reply was performed by `score`;
-- Effects stayed within the declared filesystem scope;
-- required Hard checks passed, or exact blockers were reported.
+- target surface 是 Markdown；
+- 相关本地 preference references 已应用；
+- 当变更触及 metadata、audience、module boundary、sections、assertions、language、keywords、pattern、path 或 links 时，这些面已被处理；
+- `score` 没有执行非 Markdown prose polish、product copy、workflow skill、primitive skill、skill patch、code comment、commit message、PR description 或 issue reply；
+- Effects 保持在声明的 filesystem scope 内；
+- 要求的 Hard checks 已通过，或准确 blocker 已报告。

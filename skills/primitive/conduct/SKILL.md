@@ -31,45 +31,47 @@ Do not use when:
 
 Soft:
 
-- MUST require a real workflow case before creating a public workflow skill.
-- MUST reject material that cannot support workflow A/Y/X、gate logic、internal skill routing 和 disclosure boundary.
-- MUST NOT invent workflow case、routing、gate logic、disclosure boundary 或 A/Y/X。
-- MUST keep the public workflow skill's own governance rule distinct from the internal skills it routes to.
-- MUST decide `policy.allow_implicit_invocation` from Pattern precision and side-effect risk.
-- MUST treat external workflow skills and deleted old skills as references only, never as source of truth.
-- SHOULD ask only for the smallest missing workflow material when rejection is recoverable.
+- MUST 在创建 public workflow skill 前要求真实 workflow case。
+- MUST 打回不能支撑 workflow A/Y/X、gate logic、internal skill routing 和 disclosure boundary 的材料。
+- MUST NOT 编造 workflow case、routing、gate logic、disclosure boundary 或 A/Y/X。
+- MUST 保持 public workflow skill 自己的 governance rule，不把它和被路由的 internal skills 混在一起。
+- MUST 根据 Pattern 精确度和 side-effect risk 决定 `policy.allow_implicit_invocation`。
+- MUST 只把外部 workflow skills 和已删除旧 skill 当作参考，不能当作 source of truth。
+- 如果材料不足但可补救，SHOULD 只询问最小缺失 workflow material。
 
 Hard:
 
-- Run `pnpm generate:check` after changing skill frontmatter, `agents/openai.yaml`, dispatcher inputs, or generated projection targets.
-- Run `pnpm verify` before finishing repo changes.
+- When: 修改 skill frontmatter、`agents/openai.yaml`、dispatcher 输入或 generated projection target。
+  Do: MUST 运行 `pnpm generate:check`。
+
+- When: 完成 repo 变更前。
+  Do: MUST 运行 `pnpm verify`。
 
 ## Effects
 
-- Conversation: MAY show `🎼 conduct`, rejection reason, workflow rule, gate logic, internal skill routing, disclosure boundary, and verification result.
-- Filesystem: MAY create one public workflow skill under a supported direct skill path, its `agents/openai.yaml`, local references, and directly required generated projections.
+- Conversation: MAY 展示打回原因、workflow rule、gate logic、internal skill routing、disclosure boundary 和验证结果。
+- Filesystem: MAY 在受支持的 direct skill path 下创建一个 public workflow skill、它的 `agents/openai.yaml`、本地 references 和直接需要的 generated projections。
 - External: none.
 
 ## Workflow
 
-1. Read the real workflow case. If material is insufficient, MUST use the local insufficient-material reference and stop.
-2. Read workflow A/Y/X、gate logic、internal skill routing、disclosure boundary 和 invocation policy basis.
-3. Confirm the target is a public workflow skill; otherwise route to `notate` or `retune`.
-4. Create the source projection: `SKILL.md`, `agents/openai.yaml`, and required local references.
-5. Run the required Hard checks or report the exact blocker.
+1. 读取真实 workflow case。材料不足时，MUST 使用本地 insufficient-material reference 并停止。
+2. 读出 workflow A/Y/X、gate logic、internal skill routing、disclosure boundary 和 invocation policy basis。
+3. 确认目标是 public workflow skill；否则路由到 `notate` 或 `retune`。
+4. 创建 source projection：`SKILL.md`、`agents/openai.yaml` 和必要本地 references。
+5. 运行要求的 Hard checks，或报告准确 blocker。
 
 ## References
 
-- 材料不足时，MUST use [insufficient material](references/insufficient-material.md).
+- 材料不足时，MUST 使用 [insufficient material](references/insufficient-material.md)。
 
 ## Validation
 
 Before done:
 
-- `🎼 conduct` is visible when this skill is active;
-- the input was a real workflow case, or insufficient material was rejected;
-- workflow A/Y/X、gate logic、internal skill routing 和 disclosure boundary are explicit before file creation;
-- the created public workflow skill has `agents/openai.yaml` and an explicit `policy.allow_implicit_invocation` decision;
-- no internal primitive skill, existing-skill patch, external migration, or verifier implementation was created by `conduct`;
-- Effects stayed within the declared filesystem scope;
-- required Hard checks passed, or exact blockers were reported.
+- 输入是真实 workflow case，或材料不足已被打回；
+- 创建文件前，workflow A/Y/X、gate logic、internal skill routing 和 disclosure boundary 已明确；
+- 创建的 public workflow skill 有 `agents/openai.yaml`，且 `policy.allow_implicit_invocation` 决策明确；
+- `conduct` 没有创建 internal primitive skill、已有 skill patch、外部迁移或 verifier implementation；
+- Effects 保持在声明的 filesystem scope 内；
+- 要求的 Hard checks 已通过，或准确 blocker 已报告。
