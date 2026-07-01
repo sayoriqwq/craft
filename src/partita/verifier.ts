@@ -1,5 +1,8 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { dirname, join, relative, resolve, sep } from 'node:path'
+import * as Console from 'effect/Console'
+import * as Effect from 'effect/Effect'
+import { PartitaError } from './errors.ts'
 import {
   blockProjectionEndPrefix,
   blockProjectionStartPrefix,
@@ -10,10 +13,7 @@ import {
   routingTableEnd,
   routingTableStart,
   validProjectionSource,
-} from '@partita/generic-projection'
-import * as Console from 'effect/Console'
-import * as Effect from 'effect/Effect'
-import { PartitaError } from './errors.ts'
+} from './projection.ts'
 import { validateSkillText } from './skill-validation.ts'
 
 export interface VerifyProjectOptions {

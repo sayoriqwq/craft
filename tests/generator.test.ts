@@ -149,27 +149,33 @@ unsupported_field: Demo routing
         dependencies: Record<string, string>
         devDependencies: Record<string, string>
         files: ReadonlyArray<string>
+        name: string
         packageManager: string
+        publishConfig: { access: string }
         scripts: {
           build: string
           generate: string
           lint: string
           package?: string
+          prepack: string
           test: string
           typecheck: string
           verify: string
         }
       }
+      assert.strictEqual(packageJson.name, '@sayoriqwq/partita')
       assert.strictEqual(packageJson.packageManager, 'pnpm@11.7.0')
-      assert.strictEqual(packageJson.dependencies['@partita/generic-projection'], 'workspace:*')
       assert.strictEqual(packageJson.dependencies.effect, '4.0.0-beta.90')
+      assert.strictEqual(packageJson.dependencies['@effect/platform-node'], '4.0.0-beta.90')
       assert.strictEqual(packageJson.devDependencies.turbo, '^2.10.1')
-      assert.deepStrictEqual(packageJson.files, ['dist', '.codex-plugin', 'LICENSE', 'README.md', 'CONTEXT.md', 'HARNESS.md', 'harness', 'packages', 'skills'])
+      assert.deepStrictEqual(packageJson.files, ['dist', 'LICENSE', 'README.md'])
+      assert.strictEqual(packageJson.publishConfig.access, 'public')
       assert.strictEqual(packageJson.bin.partita, 'dist/bin/partita.js')
       assert.strictEqual(packageJson.scripts.build, 'turbo run build --filter=@partita/generic-projection && rm -rf dist && tsc --project tsconfig.build.json && chmod +x dist/bin/partita.js')
       assert.strictEqual(packageJson.scripts.generate, 'pnpm build && node dist/bin/partita.js generate')
       assert.strictEqual(packageJson.scripts.lint, 'eslint eslint.config.mjs "bin/**/*.ts" "src/**/*.ts" "tests/**/*.ts" "packages/*/src/**/*.ts" --no-error-on-unmatched-pattern')
       assert.strictEqual(packageJson.scripts.package, undefined)
+      assert.strictEqual(packageJson.scripts.prepack, 'pnpm build')
       assert.strictEqual(packageJson.scripts.test, 'turbo run build --filter=@partita/generic-projection && vitest run')
       assert.strictEqual(packageJson.scripts.typecheck, 'turbo run build --filter=@partita/generic-projection && turbo run typecheck --filter=@partita/generic-projection && tsgo --noEmit')
       assert.strictEqual(packageJson.scripts.verify, 'pnpm generate:check && node dist/bin/partita.js verify && pnpm typecheck && pnpm test && pnpm lint && pnpm knip && pnpm effect:verify')

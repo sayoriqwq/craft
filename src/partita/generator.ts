@@ -1,15 +1,15 @@
 import type { GeneratedFile, GeneratedFileCheckResult, GeneratedFileWriteResult, JsonObject, PluginManifest, SkillMetadata } from './model.ts'
 
+import { Effect, FileSystem } from 'effect'
+import { readSkillFrontmatter } from './frontmatter.ts'
+import { PartitaGeneratorError } from './model.ts'
 import {
   fileCopyProjectionSource,
   renderFileCopyProjection,
   routingTableEnd as ROUTING_TABLE_END,
   routingTableStart as ROUTING_TABLE_START,
   validProjectionSource,
-} from '@partita/generic-projection'
-import { Effect, FileSystem } from 'effect'
-import { readSkillFrontmatter } from './frontmatter.ts'
-import { PartitaGeneratorError } from './model.ts'
+} from './projection.ts'
 
 const DISPATCHER_RELATIVE_PATH = 'harness/skills/dispatcher.md'
 const namespaceShorthands = {
@@ -281,7 +281,6 @@ const effectHarnessPackageFields = Effect.fn('effectHarnessPackageFields')(funct
 
   return {
     dependencies: {
-      '@partita/generic-projection': 'workspace:*',
       'effect': yield* requireString(baseline, manifestPath, 'effect'),
       '@effect/platform-node': yield* requireString(baseline, manifestPath, '@effect/platform-node'),
     },
@@ -310,6 +309,7 @@ const effectHarnessPackageFields = Effect.fn('effectHarnessPackageFields')(funct
       'link:global': 'pnpm build && pnpm link --global',
       'lint': 'eslint eslint.config.mjs "bin/**/*.ts" "src/**/*.ts" "tests/**/*.ts" "packages/*/src/**/*.ts" --no-error-on-unmatched-pattern',
       'lint:fix': 'eslint eslint.config.mjs "bin/**/*.ts" "src/**/*.ts" "tests/**/*.ts" "packages/*/src/**/*.ts" --fix --no-error-on-unmatched-pattern',
+      'prepack': 'pnpm build',
       'test': 'turbo run build --filter=@partita/generic-projection && vitest run',
       'typecheck': 'turbo run build --filter=@partita/generic-projection && turbo run typecheck --filter=@partita/generic-projection && tsgo --noEmit',
       'verify': 'pnpm generate:check && node dist/bin/partita.js verify && pnpm typecheck && pnpm test && pnpm lint && pnpm knip && pnpm effect:verify',
@@ -319,27 +319,23 @@ const effectHarnessPackageFields = Effect.fn('effectHarnessPackageFields')(funct
 
 const buildPackageJson = Effect.fn('buildPackageJson')(function* (root: string, version: string) {
   const packageJson = {
-    name: 'partita',
+    name: '@sayoriqwq/partita',
     type: 'module',
     version,
     description: 'CLI-backed Codex skill harness for user-defined workflow skills.',
     author: 'sayori',
-    private: true,
     packageManager: 'pnpm@11.7.0',
     license: 'MIT',
+    publishConfig: {
+      access: 'public',
+    },
     bin: {
       partita: 'dist/bin/partita.js',
     },
     files: [
       'dist',
-      '.codex-plugin',
       'LICENSE',
       'README.md',
-      'CONTEXT.md',
-      'HARNESS.md',
-      'harness',
-      'packages',
-      'skills',
     ],
     ...(yield* effectHarnessPackageFields(root)),
   }

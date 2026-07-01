@@ -7,10 +7,10 @@ import * as Flag from 'effect/unstable/cli/Flag'
 import { generateProject } from '../partita/generator.ts'
 import { installCodexPlugin, installCodexSkill } from '../partita/install.ts'
 import {
-  printSourcePlan,
-  printSourceStatus,
-  verifySourceEntries,
-} from '../partita/source-entry.ts'
+  printPinPlan,
+  printPinStatus,
+  verifyPins,
+} from '../partita/pin.ts'
 import { verifyProject } from '../partita/verifier.ts'
 
 export interface CliConfig {
@@ -35,55 +35,55 @@ const checkFlag = Flag.boolean('check').pipe(
   Flag.withDescription('Check generated files without writing'),
 )
 
-const sourceContractFlag = Flag.path('contract').pipe(
+const pinContractFlag = Flag.path('contract').pipe(
   Flag.withDescription('GitHub subtree pin contract path; defaults to repos/<name>.subtree.json from --name/--prefix'),
   Flag.withDefault(''),
 )
 
-const sourceNameFlag = Flag.string('name').pipe(
-  Flag.withDescription('Source entry name'),
+const pinNameFlag = Flag.string('name').pipe(
+  Flag.withDescription('Pin name'),
   Flag.withDefault(''),
 )
 
-const sourceOwnershipModeFlag = Flag.choice('ownership-mode', ['direct', 'provider', 'prelude-maintain'] as const).pipe(
-  Flag.withDescription('Source entry ownership mode'),
+const pinOwnershipModeFlag = Flag.choice('ownership-mode', ['direct', 'provider', 'prelude-maintain'] as const).pipe(
+  Flag.withDescription('Pin ownership mode'),
   Flag.withDefault('direct' as const),
 )
 
-function sourcePolicyDecisionFlag(name: string, description: string) {
+function pinPolicyDecisionFlag(name: string, description: string) {
   return Flag.choice(name, ['enabled', 'recommended', 'disabled'] as const).pipe(
     Flag.withDescription(description),
     Flag.withDefault('recommended' as const),
   )
 }
 
-const sourceFilesExcludeFlag = Flag.choice('files-exclude', ['enabled', 'disabled'] as const).pipe(
+const pinFilesExcludeFlag = Flag.choice('files-exclude', ['enabled', 'disabled'] as const).pipe(
   Flag.withDescription('Whether editor file trees should hide the source prefix'),
   Flag.withDefault('disabled' as const),
 )
 
-const sourcePlanFlags = {
+const pinPlanFlags = {
   agentRoute: Flag.string('agent-route').pipe(Flag.withDescription('Agent route file path'), Flag.withDefault('')),
   anchor: Flag.string('anchor').pipe(Flag.withDescription('Anchor or LLM document path'), Flag.withDefault('')),
   branch: Flag.string('branch').pipe(Flag.withDescription('Upstream branch'), Flag.withDefault('main')),
-  contractPath: sourceContractFlag,
-  filesExclude: sourceFilesExcludeFlag,
-  name: sourceNameFlag,
-  ownershipMode: sourceOwnershipModeFlag,
+  contractPath: pinContractFlag,
+  filesExclude: pinFilesExcludeFlag,
+  name: pinNameFlag,
+  ownershipMode: pinOwnershipModeFlag,
   prefix: Flag.string('prefix').pipe(Flag.withDescription('Local source prefix'), Flag.withDefault('')),
   ref: Flag.string('ref').pipe(Flag.withDescription('Pinned upstream ref or subtree split'), Flag.withDefault('')),
   repository: Flag.string('repository').pipe(Flag.withDescription('Upstream repository URL'), Flag.withDefault('')),
-  searchExclude: sourcePolicyDecisionFlag('search-exclude', 'Whether editor search should exclude the source prefix'),
+  searchExclude: pinPolicyDecisionFlag('search-exclude', 'Whether editor search should exclude the source prefix'),
   updateCommand: Flag.string('update-command').pipe(Flag.withDescription('Source update command'), Flag.withDefault('')),
   verifyCommand: Flag.string('verify-command').pipe(Flag.withDescription('Source verify command'), Flag.withDefault('')),
-  watcherExclude: sourcePolicyDecisionFlag('watcher-exclude', 'Whether editor file watching should exclude the source prefix'),
+  watcherExclude: pinPolicyDecisionFlag('watcher-exclude', 'Whether editor file watching should exclude the source prefix'),
 }
 
 function makeCli(config: CliConfig) {
   const root = rootFlag(config.root)
-  const sourceReadFlags = {
-    contractPath: sourceContractFlag,
-    name: sourceNameFlag,
+  const pinReadFlags = {
+    contractPath: pinContractFlag,
+    name: pinNameFlag,
     prefix: Flag.string('prefix').pipe(Flag.withDescription('Local source prefix used to derive the default contract path'), Flag.withDefault('')),
     root,
   }
@@ -126,29 +126,29 @@ function makeCli(config: CliConfig) {
     Command.withSubcommands([installPlugin, installSkill]),
   )
 
-  const sourcePlan = Command.make('plan', {
-    ...sourcePlanFlags,
+  const pinPlan = Command.make('plan', {
+    ...pinPlanFlags,
     root,
   }, Effect.fnUntraced(function* (options) {
-    yield* printSourcePlan(options)
+    yield* printPinPlan(options)
   })).pipe(
     Command.withDescription('Plan a GitHub git-subtree pin contract without writing files'),
   )
 
-  const sourceStatus = Command.make('status', sourceReadFlags, Effect.fnUntraced(function* (options) {
-    yield* printSourceStatus(options)
+  const pinStatus = Command.make('status', pinReadFlags, Effect.fnUntraced(function* (options) {
+    yield* printPinStatus(options)
   })).pipe(
     Command.withDescription('Show GitHub git-subtree pin status and verification issues'),
   )
 
-  const sourceVerify = Command.make('verify', sourceReadFlags, Effect.fnUntraced(function* (options) {
-    yield* verifySourceEntries(options)
+  const pinVerify = Command.make('verify', pinReadFlags, Effect.fnUntraced(function* (options) {
+    yield* verifyPins(options)
   })).pipe(
     Command.withDescription('Hard-verify GitHub git-subtree pin contracts'),
   )
 
-  const sourceAdd = Command.make('add', {
-    ...sourcePlanFlags,
+  const pinAdd = Command.make('add', {
+    ...pinPlanFlags,
     dryRun: Flag.boolean('dry-run').pipe(
       Flag.withDescription('Only print the add plan; direct git subtree writes are intentionally not implemented'),
       Flag.withDefault(true),
@@ -156,39 +156,39 @@ function makeCli(config: CliConfig) {
     root,
   }, Effect.fnUntraced(function* ({ dryRun, ...options }) {
     if (!dryRun) {
-      return yield* Effect.fail(new Error('partita source add only supports --dry-run in this implementation'))
+      return yield* Effect.fail(new Error('partita pin add only supports --dry-run in this implementation'))
     }
-    yield* printSourcePlan(options)
+    yield* printPinPlan(options)
   })).pipe(
     Command.withDescription('Dry-run a GitHub git-subtree pin add plan'),
   )
 
-  const sourceUpdate = Command.make('update', {
-    contractPath: sourceContractFlag,
+  const pinUpdate = Command.make('update', {
+    contractPath: pinContractFlag,
     dryRun: Flag.boolean('dry-run').pipe(
       Flag.withDescription('Only print update status; direct git subtree update is intentionally not implemented'),
       Flag.withDefault(true),
     ),
-    name: sourceNameFlag,
+    name: pinNameFlag,
     prefix: Flag.string('prefix').pipe(Flag.withDescription('Local source prefix used to derive the default contract path'), Flag.withDefault('')),
     root,
   }, Effect.fnUntraced(function* ({ dryRun, ...options }) {
     if (!dryRun) {
-      return yield* Effect.fail(new Error('partita source update only supports --dry-run in this implementation'))
+      return yield* Effect.fail(new Error('partita pin update only supports --dry-run in this implementation'))
     }
-    yield* printSourceStatus(options)
+    yield* printPinStatus(options)
   })).pipe(
     Command.withDescription('Dry-run GitHub git-subtree update checks before a domain wrapper mutates the tree'),
   )
 
-  const source = Command.make('source').pipe(
+  const pin = Command.make('pin').pipe(
     Command.withDescription('Manage GitHub repository pins materialized with git subtree'),
-    Command.withSubcommands([sourcePlan, sourceStatus, sourceVerify, sourceAdd, sourceUpdate]),
+    Command.withSubcommands([pinPlan, pinStatus, pinVerify, pinAdd, pinUpdate]),
   )
 
   return Command.make('partita').pipe(
     Command.withDescription('Partita skill harness CLI'),
-    Command.withSubcommands([generate, verify, install, source]),
+    Command.withSubcommands([generate, verify, install, pin]),
   )
 }
 

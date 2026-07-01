@@ -1,6 +1,6 @@
 interface:
   display_name: "Pin"
   short_description: "把 GitHub 仓库以 git subtree 接入为 agent 真源"
-  default_prompt: "使用 pin 建立 GitHub git-subtree contract，默认写入 repos/<name>.subtree.json，明确 GitHub repo/branch/ref、local prefix、subtree split/trailer、anchor、agent route、editor policy、ownership、update/verify command 和 import block，并通过 partita source 或 owning wrapper 验证。"
+  default_prompt: "使用 $pin 建立 GitHub git-subtree contract，默认写入 repos/<name>.subtree.json，明确 GitHub repo/branch/ref、local prefix、subtree split/trailer、anchor、agent route、editor policy、ownership、update/verify command 和 import block，并通过 partita pin 或 owning wrapper 验证。"
 policy:
   allow_implicit_invocation: false

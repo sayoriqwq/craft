@@ -1,28 +1,23 @@
 {
-  "name": "partita",
+  "name": "@sayoriqwq/partita",
   "type": "module",
   "version": "0.1.0",
   "description": "CLI-backed Codex skill harness for user-defined workflow skills.",
   "author": "sayori",
-  "private": true,
   "packageManager": "pnpm@11.7.0",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "bin": {
     "partita": "dist/bin/partita.js"
   },
   "files": [
     "dist",
-    ".codex-plugin",
     "LICENSE",
-    "README.md",
-    "CONTEXT.md",
-    "HARNESS.md",
-    "harness",
-    "packages",
-    "skills"
+    "README.md"
   ],
   "dependencies": {
-    "@partita/generic-projection": "workspace:*",
     "effect": "4.0.0-beta.90",
     "@effect/platform-node": "4.0.0-beta.90"
   },
@@ -51,6 +46,7 @@
     "link:global": "pnpm build && pnpm link --global",
     "lint": "eslint eslint.config.mjs \"bin/**/*.ts\" \"src/**/*.ts\" \"tests/**/*.ts\" \"packages/*/src/**/*.ts\" --no-error-on-unmatched-pattern",
     "lint:fix": "eslint eslint.config.mjs \"bin/**/*.ts\" \"src/**/*.ts\" \"tests/**/*.ts\" \"packages/*/src/**/*.ts\" --fix --no-error-on-unmatched-pattern",
+    "prepack": "pnpm build",
     "test": "turbo run build --filter=@partita/generic-projection && vitest run",
     "typecheck": "turbo run build --filter=@partita/generic-projection && turbo run typecheck --filter=@partita/generic-projection && tsgo --noEmit",
     "verify": "pnpm generate:check && node dist/bin/partita.js verify && pnpm typecheck && pnpm test && pnpm lint && pnpm knip && pnpm effect:verify"

@@ -1,6 +1,6 @@
 ---
 name: pin
-description: "Use when the user explicitly asks to pin a GitHub repository into the current project as a git-subtree source entry with sibling subtree contract, anchor, route, editor policy, update path, verify path, and import block. Not for non-GitHub sources, non-subtree mechanisms, temporary clones, web fetches, node_modules lookup, package-version pins, or UI/thread pinning."
+description: "Use when the user explicitly asks to pin a GitHub repository into the current project as a git-subtree source prefix with sibling subtree contract, anchor, route, editor policy, update path, verify path, and import block. Not for non-GitHub sources, non-subtree mechanisms, temporary clones, web fetches, node_modules lookup, package-version pins, or UI/thread pinning."
 ---
 
 # Pin
@@ -36,7 +36,7 @@ Do not use when:
 
 Soft:
 
-- SHOULD 优先使用 `partita source plan`、`partita source status` 和 `partita source verify` 表达 GitHub subtree pin contract。
+- SHOULD 优先使用 `partita pin plan`、`partita pin status` 和 `partita pin verify` 表达 GitHub subtree pin contract。
 - SHOULD 让 target repo 的脚本保持短，只调用 Partita CLI 或 owning domain wrapper。
 - SHOULD 将 domain-specific 语义留给 owning harness；Partita 只表达 GitHub subtree pin 字段和 hard blocks。
 - SHOULD 默认 contract path 为 `repos/<name>.subtree.json`，与 `repos/<name>/` 并列；MAY 只在明确需要时使用 `--contract <path>` 覆盖。
@@ -61,14 +61,14 @@ Hard:
 - When: editor policy 未决。
   Do: MUST 默认阻断 auto-import；MUST 把 watch/search exclude 作为明确 decision；MUST NOT 默认隐藏 repo。
 
-- When: 需要 materialize、update 或 verify source entry。
+- When: 需要 materialize、update 或 verify pinned source prefix。
   Do: MUST 使用 Partita CLI、当前项目已有 wrapper 或 owning harness command；MUST NOT 把大段脚本塞进 target repo。
 
 - When: 当前 repo 是 prelude-managed target。
   Do: MUST NOT direct write 绕过 prelude lifecycle；使用 provider/prelude-maintain ownership mode 或停止报告 blocker。
 
 - When: 应用或测试代码从 source prefix import。
-  Do: MUST hard block；source entry 是 agent reference，不是 application dependency。
+  Do: MUST hard block；pinned source prefix 是 agent reference，不是 application dependency。
 
 ## Effects
 
@@ -81,17 +81,17 @@ Hard:
 1. 确认请求是 GitHub repository git-subtree pin，而不是 temporary clone、web fetch、`node_modules` lookup、package version pin 或非 GitHub source。
 2. 收集 GitHub repository、branch/ref、local prefix、subtree split/trailer、anchor/LLM doc、agent route、ownership mode、update command 和 verify command。
 3. 决定 editor policy：auto-import exclude 默认 block；watch/search exclude 明确选择；files/repo hide 只有用户选择时启用；VSCode 和 Zed 分开处理。
-4. 运行 `partita source plan` 生成只读 `repos/<name>.subtree.json` contract 和 editor settings shape。
+4. 运行 `partita pin plan` 生成只读 `repos/<name>.subtree.json` contract 和 editor settings shape。
 5. 如果 target 是 prelude-managed，确认 ownership 是 `provider` 或 `prelude-maintain`，不要 direct write managed surfaces。
-6. 使用 `partita source status --name <name> --prefix repos/<name>` 检查当前 source prefix、anchor、route、subtree split/trailer 和 editor state。
-7. 使用 `partita source verify --name <name> --prefix repos/<name>` hard block source 缺失、gitlink/submodule、缺 split/trailer、非 GitHub URL、非 subtree mechanism、错误 import、缺 anchor/route 和 prelude direct write。
+6. 使用 `partita pin status --name <name> --prefix repos/<name>` 检查当前 source prefix、anchor、route、subtree split/trailer 和 editor state。
+7. 使用 `partita pin verify --name <name> --prefix repos/<name>` hard block source 缺失、gitlink/submodule、缺 split/trailer、非 GitHub URL、非 subtree mechanism、错误 import、缺 anchor/route 和 prelude direct write。
 8. 汇报 changed files、contract path、CLI commands、hard block 覆盖点和验证结果。
 
 ## References
 
-- `partita source plan`
-- `partita source status`
-- `partita source verify`
+- `partita pin plan`
+- `partita pin status`
+- `partita pin verify`
 
 ## Validation
 
@@ -106,4 +106,4 @@ Before done:
 - VSCode 和 Zed settings shape 已分开处理；
 - prelude-managed target 没有被 direct write 绕过；
 - 应用和测试代码没有从 source prefix import；
-- `partita source status` 或 `partita source verify` 的结果已报告，或已说明具体 blocker。
+- `partita pin status` 或 `partita pin verify` 的结果已报告，或已说明具体 blocker。

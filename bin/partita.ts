@@ -10,10 +10,10 @@ import * as CliError from 'effect/unstable/cli/CliError'
 import { runCli } from '../src/cli/Main.ts'
 import { errorMessage } from '../src/partita/errors.ts'
 
-const root = resolvePackageRoot(fileURLToPath(import.meta.url))
-const version = readPackageVersion(join(root, 'package.json'))
+const packageRoot = resolvePackageRoot(fileURLToPath(import.meta.url))
+const version = readPackageVersion(join(packageRoot, 'package.json'))
 
-runCli({ root, version }).pipe(
+runCli({ root: process.cwd(), version }).pipe(
   Effect.catch((error: unknown) =>
     Effect.sync(() => {
       if (CliError.isCliError(error)) {
