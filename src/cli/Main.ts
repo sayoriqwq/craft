@@ -5,6 +5,11 @@ import * as Path from 'effect/Path'
 import * as Command from 'effect/unstable/cli/Command'
 import * as Flag from 'effect/unstable/cli/Flag'
 import { generateProject } from '../partita/generator.ts'
+import {
+  printChezmoiHomeApply,
+  printChezmoiHomeDiff,
+  printChezmoiHomeStatus,
+} from '../partita/home.ts'
 import { installCodexSkill } from '../partita/install.ts'
 import {
   printSourcePlan,
@@ -118,6 +123,39 @@ function makeCli(config: CliConfig) {
     Command.withSubcommands([installSkill]),
   )
 
+  const homeStatus = Command.make('status', {
+    root,
+  }, Effect.fnUntraced(function* ({ root }) {
+    yield* printChezmoiHomeStatus({ root })
+  })).pipe(
+    Command.withDescription('Show chezmoi home materialization status'),
+  )
+
+  const homeApply = Command.make('apply', {
+    root,
+    write: Flag.boolean('write').pipe(
+      Flag.withDescription('Confirm that chezmoi should write user-home materialization'),
+      Flag.withDefault(false),
+    ),
+  }, Effect.fnUntraced(function* ({ root, write }) {
+    yield* printChezmoiHomeApply({ root, write })
+  })).pipe(
+    Command.withDescription('Delegate user-home materialization writes to chezmoi'),
+  )
+
+  const homeDiff = Command.make('diff', {
+    root,
+  }, Effect.fnUntraced(function* ({ root }) {
+    yield* printChezmoiHomeDiff({ root })
+  })).pipe(
+    Command.withDescription('Show non-mutating chezmoi diff for user-home materialization'),
+  )
+
+  const home = Command.make('home').pipe(
+    Command.withDescription('Inspect or run chezmoi-owned user-home materialization'),
+    Command.withSubcommands([homeStatus, homeDiff, homeApply]),
+  )
+
   const sourcePlan = Command.make('plan', {
     ...sourcePlanFlags,
     root,
@@ -180,7 +218,7 @@ function makeCli(config: CliConfig) {
 
   return Command.make('partita').pipe(
     Command.withDescription('Partita skill harness CLI'),
-    Command.withSubcommands([generate, verify, install, source]),
+    Command.withSubcommands([generate, verify, install, home, source]),
   )
 }
 

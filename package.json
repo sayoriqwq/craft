@@ -42,6 +42,8 @@
     "build": "turbo run build --filter=@partita/generic-projection && rm -rf dist && tsc --project tsconfig.build.json && chmod +x dist/bin/partita.js",
     "generate": "pnpm build && node dist/bin/partita.js generate",
     "generate:check": "pnpm build && node dist/bin/partita.js generate --check",
+    "home:diff": "pnpm build && node dist/bin/partita.js home diff",
+    "home:status": "pnpm build && node dist/bin/partita.js home status",
     "install:codex-skill": "pnpm build && node dist/bin/partita.js install codex-skill",
     "knip": "knip",
     "link:global": "pnpm build && pnpm link --global",

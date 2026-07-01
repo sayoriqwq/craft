@@ -127,13 +127,16 @@ unsupported_field: Demo routing
         files: ReadonlyArray<string>
         packageManager: string
         scripts: {
-          build: string
-          generate: string
-          lint: string
-          package?: string
-          test: string
-          typecheck: string
-          verify: string
+          'build': string
+          'generate': string
+          'home:diff': string
+          'home:status': string
+          'install:codex-skill': string
+          'lint': string
+          'package'?: string
+          'test': string
+          'typecheck': string
+          'verify': string
         }
       }
       assert.strictEqual(packageJson.packageManager, 'pnpm@11.7.0')
@@ -144,6 +147,9 @@ unsupported_field: Demo routing
       assert.strictEqual(packageJson.bin.partita, 'dist/bin/partita.js')
       assert.strictEqual(packageJson.scripts.build, 'turbo run build --filter=@partita/generic-projection && rm -rf dist && tsc --project tsconfig.build.json && chmod +x dist/bin/partita.js')
       assert.strictEqual(packageJson.scripts.generate, 'pnpm build && node dist/bin/partita.js generate')
+      assert.strictEqual(packageJson.scripts['home:diff'], 'pnpm build && node dist/bin/partita.js home diff')
+      assert.strictEqual(packageJson.scripts['home:status'], 'pnpm build && node dist/bin/partita.js home status')
+      assert.strictEqual(packageJson.scripts['install:codex-skill'], 'pnpm build && node dist/bin/partita.js install codex-skill')
       assert.strictEqual(packageJson.scripts.lint, 'eslint eslint.config.mjs "bin/**/*.ts" "src/**/*.ts" "tests/**/*.ts" "packages/*/src/**/*.ts" --no-error-on-unmatched-pattern')
       assert.strictEqual(packageJson.scripts.package, undefined)
       assert.strictEqual(packageJson.scripts.test, 'turbo run build --filter=@partita/generic-projection && vitest run')

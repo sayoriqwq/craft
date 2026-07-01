@@ -9,7 +9,7 @@ Partita 不 owns user-home dotfile materialization、global runtime skill univer
 ## State
 
 - `skills/` 是 self-owned skill source input。
-- `src/partita/` 负责 Partita-specific generation、verification、source pin 和 install wrapper。
+- `src/partita/` 负责 Partita-specific generation、verification、source pin、skills.sh install wrapper 和 chezmoi home adapter。
 - `harness/skills/dispatcher.md` 是 generated source inventory 和 projection audit artifact。
 - `packages/generic-projection/` 是 repo-internal generic projection helper。
 - `tests/` 承载 executable behavior checks。
@@ -23,6 +23,7 @@ Partita 不 owns user-home dotfile materialization、global runtime skill univer
 - `src/partita/verifier.ts` 校验 Partita source shape，并阻止迁出 surfaces 回流。
 - `src/partita/source-entry.ts` 管理 GitHub git-subtree source pins。
 - `src/partita/install.ts` 是 skills.sh CLI 的 thin wrapper。
+- `src/partita/home.ts` 是 chezmoi CLI 的 thin wrapper。
 - `harness/skills/dispatcher.md` 从 `skills/` source `SKILL.md` frontmatter 和 `agents/openai.yaml` 生成。
 - `MIGRATION.md` 记录迁移目标、架构图和 ownership table。
 
@@ -33,9 +34,11 @@ pnpm generate
 pnpm generate:check
 pnpm verify
 pnpm install:codex-skill
+pnpm home:status
+pnpm home:diff
 ```
 
-## Runtime
+## Loop
 
 Partita 不直接写 global runtime skill universe。
 
@@ -50,6 +53,16 @@ pnpm install:codex-skill
 不要同时把 Partita 安装进 personal Codex plugin marketplace；plugin cache 会生成 `partita:<skill>` 副本，和 flat global skill 形成双入口。
 
 chezmoi 负责 user-home mapping 和 dotfile materialization。
+
+Partita 的 home adapter 只调用 chezmoi，不直接编辑用户目录：
+
+```bash
+pnpm home:status
+pnpm home:diff
+partita home apply --write
+```
+
+`partita home diff` 运行非写入的 `chezmoi diff`。只有显式传入 `--write` 时，`partita home apply` 才运行 `chezmoi apply`。
 
 ## Source Pins
 

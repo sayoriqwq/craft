@@ -13,7 +13,7 @@ Partita 不拥有 user-home dotfile materialization、global runtime skill unive
 本 repo owns：
 
 - `skills/` 下的 self-owned skill source；
-- `src/partita/` 下的 TypeScript/Effect CLI、generator、verifier、install wrapper 和 source pin code；
+- `src/partita/` 下的 TypeScript/Effect CLI、generator、verifier、skills.sh install wrapper、chezmoi home adapter 和 source pin code；
 - `tests/` 下的 executable behavior checks；
 - `harness/skills/dispatcher.md` 下的 generated source inventory 和 projection audit artifact；
 - `packages/generic-projection/` 下的 repo-internal generic projection helpers；
@@ -52,6 +52,9 @@ Partita 不拥有 user-home dotfile materialization、global runtime skill unive
 - `runtime/references/` MUST NOT exist in this repo。
 - executable setup、sync 和 verification mechanisms 属于 owning harness 或 CLI repo。
 - Partita skills 可以调用这些 mechanisms，但 SHOULD NOT 用 prose 重新实现它们。
+- global runtime skill mutation MUST 通过 skills.sh CLI；Partita 只能提供 thin wrapper，例如 `partita install codex-skill`。
+- user-home materialization MUST 通过 chezmoi；Partita 只能提供 thin wrapper，例如 `partita home status`、`partita home diff` 和显式写入的 `partita home apply --write`。
+- agent MUST NOT 直接编辑 `~/.agents/skills` 里的 installed runtime projection。
 - zero skills MUST 保持为合法 framework state。
 - 修改 skill names、trigger policy、harness install behavior、global skill state 或 marker conventions 前，如果用户指令有多种解读，MUST 使用 interpretation gate。
 
@@ -73,4 +76,7 @@ Partita 不拥有 user-home dotfile materialization、global runtime skill unive
 pnpm generate
 pnpm generate:check
 pnpm verify
+pnpm install:codex-skill
+pnpm home:status
+pnpm home:diff
 ```
